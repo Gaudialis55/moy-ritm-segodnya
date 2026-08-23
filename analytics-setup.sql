@@ -43,10 +43,26 @@ drop policy if exists "events_insert_anon" on public.events;
 create policy "events_insert_anon" on public.events
   for insert to anon with check (true);
 
--- Читает только тот, кто вошёл в админ-панель под своей учётной записью.
+-- Читают только те, кто явно внесён в список администраторов.
+-- Роли authenticated недостаточно: если позже включить анонимный вход для
+-- личных данных, эту роль получат все пользовательницы приложения.
+create table if not exists public.admins (
+  user_id  uuid primary key references auth.users (id) on delete cascade,
+  email    text,
+  added_at timestamptz not null default now()
+);
+
+alter table public.admins enable row level security;
+
+drop policy if exists "admins_read_self" on public.admins;
+create policy "admins_read_self" on public.admins
+  for select to authenticated using (user_id = auth.uid());
+
 drop policy if exists "events_select_auth" on public.events;
-create policy "events_select_auth" on public.events
-  for select to authenticated using (true);
+drop policy if exists "events_select_admins" on public.events;
+create policy "events_select_admins" on public.events
+  for select to authenticated
+  using (exists (select 1 from public.admins a where a.user_id = auth.uid()));
 
 -- Права на удаление и изменение не выдаются никому: статистику нельзя
 -- ни подчистить, ни переписать через публичный ключ.
@@ -74,3 +90,30 @@ create policy "events_select_auth" on public.events
 --        count(*) filter (where event = 'RETURN_D1')  as день_2,
 --        count(*) filter (where event = 'RETURN_D7')  as неделя
 --   from public.events group by source order by открыли desc;
+
+-- ============================================================================
+-- Как добавить ещё одного администратора
+-- ============================================================================
+--
+-- 1. Authentication -> Users -> Add user -> Create new user:
+--    указать почту и пароль, включить "Auto confirm user".
+--    Пароль задаёт сам человек или владелец проекта.
+--
+-- 2. Выполнить здесь, подставив ту же почту:
+--
+-- insert into public.admins (user_id, email)
+-- select id, email from auth.users where email = 'новый-админ@почта'
+-- on conflict (user_id) do nothing;
+--
+-- Проверить список:
+-- select email, added_at from public.admins order by added_at;
+--
+-- Отобрать доступ:
+-- delete from public.admins where email = 'бывший-админ@почта';
+-- (сама учётная запись останется, но статистику она больше не увидит)
+--
+-- ВАЖНО: в Authentication -> Sign In / Providers переключатель
+-- "Allow new users to sign up" должен оставаться выключенным. Иначе любой,
+-- кто возьмёт публичный ключ из кода сайта, заведёт себе учётную запись.
+-- Список admins защитит статистику и в этом случае, но лишние аккаунты
+-- в проекте не нужны.
