@@ -303,6 +303,20 @@ input:focus,select:focus,textarea:focus{border-color:var(--olive);outline:none;b
 .disclaimer{margin-top:26px;text-align:center}
 
 /* ——— история ——— */
+/* короткие вопросы обратной связи: попадание результата и эффект дня */
+.ask{
+  background:var(--card);
+  border:1px solid var(--sand-soft);
+  border-radius:var(--radius);
+  padding:20px;
+  margin-top:18px;
+  box-shadow:var(--shadow);
+}
+.ask-title{font-size:.97rem;line-height:1.45;color:var(--ink);margin-top:6px}
+.ask-options{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.ask-options .chip{flex:1 1 auto;text-align:center}
+.ask-done{margin-top:12px;text-align:center}
+
 .entry{
   background:var(--card);
   border:1px solid var(--sand-soft);
@@ -391,6 +405,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--olive);outline:none;b
   <button class="btn" id="welcome-primary">Начать</button>
   <button class="btn btn-ghost mt-s" id="welcome-secondary" hidden></button>
   <button class="btn-text center mt-s" data-go="history" id="welcome-history" hidden>Мой ритм</button>
+  <button class="btn-text center" data-go="privacy">Что происходит с моими данными</button>
   <p class="muted center mt-l">Мы не спрашиваем имя, почту и телефон.<br>Всё остаётся на твоём устройстве.</p>
   <p class="muted center author">Идея и воплощение — Анна,<br>автор канала <a href="https://t.me/anna_vkuszhizni" target="_blank" rel="noopener noreferrer">«Вкус жизни»</a></p>
 </section>
@@ -494,7 +509,17 @@ input:focus,select:focus,textarea:focus{border-color:var(--olive);outline:none;b
   <p class="eyebrow">Вечер</p>
   <h2 id="evening-title" class="mt-s">Как прошёл день</h2>
   <p class="lede mt-s">Три коротких ответа. Можно в одно слово, можно пропустить.</p>
-  <form id="evening-form" class="mt-l" novalidate>
+
+  <div class="ask" id="effect-block">
+    <p class="ask-title">Как прошёл сегодняшний эксперимент?</p>
+    <div class="ask-options">
+      <button type="button" class="chip" data-effect="HELPED">Мне стало легче</button>
+      <button type="button" class="chip" data-effect="NO_CHANGE">Особой разницы не заметила</button>
+      <button type="button" class="chip" data-effect="DID_NOT_FIT">Мне не подошло</button>
+    </div>
+  </div>
+
+  <form id="evening-form" class="mt-m" novalidate>
     <div class="field">
       <label for="e-resource">Что сегодня действительно дало тебе ресурс?</label>
       <textarea id="e-resource" rows="3"></textarea>
@@ -523,6 +548,17 @@ input:focus,select:focus,textarea:focus{border-color:var(--olive);outline:none;b
     <p class="lede mt-s">Мы постепенно собираем твой собственный ритм.</p>
   </div>
   <div class="spacer"></div>
+  <div class="ask" id="fit-block" hidden>
+    <p class="eyebrow">Один короткий вопрос</p>
+    <p class="ask-title">Насколько это похоже на твоё сегодняшнее состояние?</p>
+    <div class="ask-options">
+      <button type="button" class="chip" data-fit="FIT_YES">Очень похоже</button>
+      <button type="button" class="chip" data-fit="FIT_PARTLY">Частично</button>
+      <button type="button" class="chip" data-fit="FIT_NO">Совсем не похоже</button>
+    </div>
+    <p class="muted ask-done" id="fit-thanks" hidden>Спасибо — так практика становится точнее.</p>
+  </div>
+
   <div class="stack">
     <button class="btn" id="done-primary" data-go="evening">Отметиться вечером</button>
     <button class="btn-text" data-go="history">Мой ритм</button>
@@ -537,6 +573,36 @@ input:focus,select:focus,textarea:focus{border-color:var(--olive);outline:none;b
   </p>
 </section>
 
+<!-- ПРИВАТНОСТЬ -->
+<section class="screen" id="s-privacy" aria-labelledby="privacy-title">
+  <div class="topbar">
+    <button class="back" id="privacy-back" aria-label="Назад">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M12.5 4L6.5 10l6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+  <h2 id="privacy-title">Что происходит с твоими данными</h2>
+  <p class="lede mt-m">
+    Дата цикла, ответы о самочувствии и вечерние заметки сохраняются только в этом браузере
+    на этом устройстве. Автор проекта их не получает — они никуда не отправляются.
+  </p>
+  <p class="lede mt-m">
+    Чтобы понимать, живёт ли практика, приложение отправляет обезличенную статистику
+    использования: открыли, прошли, вернулись на следующий день, а также твою оценку —
+    совпал ли результат и помогла ли рекомендация. В таком сообщении нет ни имени,
+    ни идентификатора, ни дня цикла, ни твоих ответов: только название события, дата
+    и то, с какого выступления ты пришла.
+  </p>
+  <p class="lede mt-m">
+    Чтобы не посчитать один и тот же браузер дважды, приложение хранит на устройстве
+    отметку о дате первого визита. Она тоже никуда не передаётся.
+  </p>
+  <div class="stack">
+    <button class="btn btn-ghost" id="privacy-wipe">Удалить мои данные с устройства</button>
+  </div>
+  <p class="muted center mt-m" id="privacy-wipe-note" hidden></p>
+  <div class="spacer"></div>
+</section>
+
 <!-- ИСТОРИЯ -->
 <section class="screen" id="s-history" aria-labelledby="history-title">
   <div class="topbar">
@@ -549,6 +615,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--olive);outline:none;b
   <div class="mt-l" id="history-list"></div>
   <div class="spacer"></div>
   <button class="btn-text center mt-m" id="history-reset">Изменить данные цикла</button>
+  <button class="btn-text center" data-go="privacy">Что происходит с моими данными</button>
 </section>
 
 </div>
@@ -570,7 +637,17 @@ var CONFIG = {
   BACKEND: "local",          // "local" | "supabase"
   SUPABASE_URL: "",
   SUPABASE_ANON_KEY: "",
-  EVENING_HOUR: 18           // с этого часа при возврате предлагаем вечерний check-in
+  EVENING_HOUR: 18,          // с этого часа при возврате предлагаем вечерний check-in
+
+  /* Обезличенная продуктовая статистика. Подробности и состав данных — в ANALYTICS.md.
+     На сервер уходит только название события, дата и источник перехода.
+     Ничего из ответов о цикле и самочувствии не отправляется никогда. */
+  ANALYTICS: {
+    ENABLED: true,
+    ENDPOINT: "",   // пусто — события копятся в браузере и видны в консоли
+    API_KEY: "",    // для Supabase — ключ anon public
+    DEBUG: true
+  }
 };
 
 /* ==========================================================================
@@ -1039,6 +1116,7 @@ var LocalStore = {
       evening_resource: null,
       evening_excess: null,
       evening_body: null,
+      evening_effect: null,
       evening_at: null
     };
     var idx = -1;
@@ -1048,6 +1126,7 @@ var LocalStore = {
       record.evening_resource = entries[idx].evening_resource;
       record.evening_excess = entries[idx].evening_excess;
       record.evening_body = entries[idx].evening_body;
+      record.evening_effect = entries[idx].evening_effect;
       record.evening_at = entries[idx].evening_at;
       entries[idx] = record;
     } else {
@@ -1077,12 +1156,14 @@ var LocalStore = {
         evening_resource: data.evening_resource,
         evening_excess: data.evening_excess,
         evening_body: data.evening_body,
+        evening_effect: data.evening_effect || null,
         evening_at: new Date().toISOString()
       });
     } else {
       entries[idx].evening_resource = data.evening_resource;
       entries[idx].evening_excess = data.evening_excess;
       entries[idx].evening_body = data.evening_body;
+      entries[idx].evening_effect = data.evening_effect || null;
       entries[idx].evening_at = new Date().toISOString();
     }
     writeJSON(STORAGE_KEYS.entries, entries);
@@ -1217,6 +1298,136 @@ var SupabaseStore = (function () {
 var Store = CONFIG.BACKEND === "supabase" ? SupabaseStore : LocalStore;
 
 /* ==========================================================================
+   ОБЕЗЛИЧЕННАЯ СТАТИСТИКА
+   Наружу уходит только { event, event_date, source }. Ни идентификатора,
+   ни дня цикла, ни фазы, ни ответов, ни свободных текстов. См. ANALYTICS.md.
+   ========================================================================== */
+var Analytics = (function () {
+  var KEYS = {
+    queue: "ritm.an.queue",
+    first: "ritm.an.first",
+    flags: "ritm.an.flags",
+    source: "ritm.an.source"
+  };
+  var conf = CONFIG.ANALYTICS;
+
+  function lsGet(key) {
+    try { return window.localStorage.getItem(key); } catch (e) { return null; }
+  }
+  function lsSet(key, value) {
+    try { window.localStorage.setItem(key, value); } catch (e) { /* приватный режим */ }
+  }
+
+  // источник закрепляется за устройством при первом визите и живёт дальше,
+  // чтобы возвраты остались привязаны к той аудитории, из которой пришли
+  function source() {
+    var saved = lsGet(KEYS.source);
+    if (saved) return saved;
+    var match = /[?&]source=([^&#]*)/.exec(window.location.search);
+    var raw = match ? decodeURIComponent(match[1]) : "";
+    var clean = raw.replace(/[^A-Za-z0-9_-]/g, "").slice(0, 32) || "direct";
+    lsSet(KEYS.source, clean);
+    return clean;
+  }
+
+  function send(item) {
+    var headers = { "Content-Type": "application/json" };
+    if (conf.API_KEY) {
+      headers.apikey = conf.API_KEY;
+      headers.Authorization = "Bearer " + conf.API_KEY;
+      headers.Prefer = "return=minimal";
+    }
+    return window.fetch(conf.ENDPOINT, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify({ event: item.event, event_date: item.date, source: item.source }),
+      keepalive: true
+    }).then(function (r) { return r.ok; }).catch(function () { return false; });
+  }
+
+  // очередь переживает отсутствие сети и отсутствие сервера
+  function flush() {
+    if (!conf.ENDPOINT) return;
+    var queue = readJSON(KEYS.queue, []);
+    if (!queue.length) return;
+    writeJSON(KEYS.queue, []);
+    (function next(rest) {
+      if (!rest.length) return;
+      send(rest[0]).then(function (ok) {
+        if (ok) { rest.shift(); next(rest); }
+        else { writeJSON(KEYS.queue, rest.concat(readJSON(KEYS.queue, []))); }
+      });
+    })(queue.slice());
+  }
+
+  function track(event) {
+    if (!conf.ENABLED) return;
+    var item = { event: event, date: todayISO(), source: source() };
+    var queue = readJSON(KEYS.queue, []);
+    queue.push(item);
+    if (queue.length > 200) queue = queue.slice(-200);
+    writeJSON(KEYS.queue, queue);
+    if (conf.DEBUG) console.info("[статистика]", item.event, "·", item.date, "·", item.source);
+    flush();
+  }
+
+  function readFlags() {
+    var flags = readJSON(KEYS.flags, {});
+    // подчищаем отметки старше месяца, чтобы хранилище не разрасталось
+    var limit = todayISO();
+    Object.keys(flags).forEach(function (key) {
+      var parts = key.split(":");
+      if (parts.length === 2 && daysBetween(parseISO(parts[1]), parseISO(limit)) > 30) delete flags[key];
+    });
+    return flags;
+  }
+
+  function onceEver(flag, event) {
+    var flags = readFlags();
+    if (flags[flag]) return false;
+    flags[flag] = true;
+    writeJSON(KEYS.flags, flags);
+    track(event);
+    return true;
+  }
+
+  function onceToday(flag, event) {
+    var flags = readFlags();
+    var key = flag + ":" + todayISO();
+    if (flags[key]) return false;
+    flags[key] = true;
+    writeJSON(KEYS.flags, flags);
+    track(event);
+    return true;
+  }
+
+  function answered(flag) {
+    return !!readFlags()[flag + ":" + todayISO()];
+  }
+
+  // открытие сайта и возвраты: считаются по дате первого визита, без идентификатора
+  function bootstrap() {
+    if (!conf.ENABLED) return;
+    var first = lsGet(KEYS.first);
+    if (!first) { first = todayISO(); lsSet(KEYS.first, first); }
+    onceToday("open", "OPEN");
+    var days = daysBetween(parseISO(first), parseISO(todayISO()));
+    if (days >= 1) onceEver("d1", "RETURN_D1");
+    if (days >= 7) onceEver("d7", "RETURN_D7");
+    flush();
+  }
+
+  return {
+    track: track,
+    onceToday: onceToday,
+    answered: answered,
+    bootstrap: bootstrap,
+    source: source,
+    pending: function () { return readJSON(KEYS.queue, []); }
+  };
+})();
+
+/* ==========================================================================
    ИНТЕРФЕЙС
    ========================================================================== */
 var $ = function (sel) { return document.querySelector(sel); };
@@ -1229,7 +1440,10 @@ var state = {
   entry: null,
   regular: null,
   eveningBackTo: "s-welcome",
-  historyBackTo: "s-welcome"
+  historyBackTo: "s-welcome",
+  privacyBackTo: "s-welcome",
+  eveningEffect: null,
+  wipeArmed: false
 };
 
 function show(id) {
@@ -1415,6 +1629,7 @@ function submitCycle(event) {
 
 /* ——— экраны 3–7 ——— */
 function startQuestions() {
+  Analytics.track("START");
   state.answers = {};
   state.qIndex = 0;
   renderQuestion();
@@ -1474,6 +1689,7 @@ function finishQuestions() {
   Store.saveDailyEntry(entry).then(function () {
     state.entry = entry;
     renderResult(entry);
+    Analytics.track("RESULT");
     show("s-result");
   });
 }
@@ -1546,6 +1762,28 @@ function renderResult(entry) {
   $("#result-coach").textContent = entry.coach || coachList[(entry.cycle_day || 0) % coachList.length];
 }
 
+/* ——— экран «Попробую сегодня» ——— */
+function openDone(withFit) {
+  $("#fit-block").hidden = !withFit || Analytics.answered("fit");
+  $("#fit-thanks").hidden = true;
+  $$("#fit-block .chip").forEach(function (c) { c.classList.remove("is-picked"); });
+  show("s-done");
+}
+
+// оценка попадания: наружу уходит только код, без дня цикла и без ответов
+function pickFit(button) {
+  Analytics.onceToday("fit", button.dataset.fit);
+  $$("#fit-block .chip").forEach(function (c) { c.classList.toggle("is-picked", c === button); });
+  $("#fit-thanks").hidden = false;
+}
+
+// оценка эффекта дня: тоже только код, свободные тексты остаются на устройстве
+function pickEffect(button) {
+  Analytics.onceToday("effect", button.dataset.effect);
+  state.eveningEffect = button.dataset.effect;
+  $$("#effect-block .chip").forEach(function (c) { c.classList.toggle("is-picked", c === button); });
+}
+
 /* ——— вечерний check-in ——— */
 function openEvening(backTo) {
   state.eveningBackTo = backTo || "s-welcome";
@@ -1554,6 +1792,11 @@ function openEvening(backTo) {
     $("#e-resource").value = (e && e.evening_resource) || "";
     $("#e-excess").value = (e && e.evening_excess) || "";
     $("#e-body").value = (e && e.evening_body) || "";
+    state.eveningEffect = (e && e.evening_effect) || null;
+    $$("#effect-block .chip").forEach(function (c) {
+      c.classList.toggle("is-picked", c.dataset.effect === state.eveningEffect);
+    });
+    Analytics.onceToday("evening_start", "EVENING_START");
     show("s-evening");
   });
 }
@@ -1563,10 +1806,12 @@ function submitEvening(event) {
   Store.saveEveningCheckin(todayISO(), {
     evening_resource: $("#e-resource").value.trim() || null,
     evening_excess: $("#e-excess").value.trim() || null,
-    evening_body: $("#e-body").value.trim() || null
+    evening_body: $("#e-body").value.trim() || null,
+    evening_effect: state.eveningEffect || null
   }).then(function () {
+    Analytics.onceToday("evening_done", "EVENING_DONE");
     $("#done-primary").hidden = true;
-    show("s-done");
+    openDone(false);
   });
 }
 
@@ -1617,7 +1862,9 @@ function renderHistory() {
       if (e.evening_at) {
         var ev = document.createElement("div");
         ev.className = "entry-evening";
-        [["Ресурс", e.evening_resource], ["Лишнее", e.evening_excess], ["Тело просит", e.evening_body]]
+        var effectText = { HELPED: "стало легче", NO_CHANGE: "особой разницы", DID_NOT_FIT: "не подошло" };
+        [["Эксперимент", effectText[e.evening_effect] || null],
+         ["Ресурс", e.evening_resource], ["Лишнее", e.evening_excess], ["Тело просит", e.evening_body]]
           .forEach(function (pair) {
             if (!pair[1]) return;
             var line = document.createElement("p");
@@ -1635,6 +1882,25 @@ function renderHistory() {
   });
 }
 
+/* ——— удаление всех данных с устройства ——— */
+function wipeData() {
+  var note = $("#privacy-wipe-note");
+  if (!state.wipeArmed) {
+    state.wipeArmed = true;
+    note.hidden = false;
+    note.textContent = "Все наблюдения будут стёрты без возможности вернуть. Нажми ещё раз, чтобы подтвердить.";
+    return;
+  }
+  try {
+    Object.keys(window.localStorage)
+      .filter(function (k) { return k.indexOf("ritm.") === 0; })
+      .forEach(function (k) { window.localStorage.removeItem(k); });
+  } catch (e) { /* приватный режим — удалять нечего */ }
+  state.wipeArmed = false;
+  note.textContent = "Готово. Данные удалены с этого устройства.";
+  window.setTimeout(function () { window.location.reload(); }, 1400);
+}
+
 /* ——— события ——— */
 function bindEvents() {
   $$("[data-go]").forEach(function (el) {
@@ -1647,7 +1913,16 @@ function bindEvents() {
         show("s-history");
         return;
       }
-      if (target === "done") { show("s-done"); return; }
+      if (target === "privacy") {
+        state.privacyBackTo = el.closest(".screen").id;
+        show("s-privacy");
+        return;
+      }
+      if (target === "done") {
+        Analytics.onceToday("try", "TRY_TODAY");
+        openDone(true);
+        return;
+      }
       show("s-" + target);
     });
   });
@@ -1678,12 +1953,21 @@ function bindEvents() {
     fillCycleForm();
     show("s-cycle");
   });
+  $("#privacy-back").addEventListener("click", function () { show(state.privacyBackTo || "s-welcome"); });
+  $("#privacy-wipe").addEventListener("click", wipeData);
+  $$("#fit-block .chip").forEach(function (b) {
+    b.addEventListener("click", function () { pickFit(b); });
+  });
+  $$("#effect-block .chip").forEach(function (b) {
+    b.addEventListener("click", function () { pickEffect(b); });
+  });
 }
 
 /* ——— запуск ——— */
 function boot() {
   fillSelects();
   bindEvents();
+  Analytics.bootstrap();
 
   Store.getProfile().then(function (profile) {
     state.profile = profile;
