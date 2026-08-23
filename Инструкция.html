@@ -1,0 +1,334 @@
+<title>Как вести «Мой ритм»</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#FAF8F4;
+  --surface:#FFFDFA;
+  --sunk:#F2EFE8;
+  --ink:#2E2B27;
+  --ink-soft:#5C574F;
+  --ink-faint:#7C766C;
+  --olive:#5F6B49;
+  --olive-bright:#7C8A5F;
+  --sand:#E0D7C7;
+  --hair:#EAE3D8;
+  --alarm:#8A5A3C;
+  --serif:"Cormorant Garamond", Georgia, serif;
+  --sans:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono:ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#1B1A17;
+    --surface:#232220;
+    --sunk:#2A2925;
+    --ink:#EFEAE1;
+    --ink-soft:#BDB6AA;
+    --ink-faint:#948D82;
+    --olive:#A7B689;
+    --olive-bright:#BECBA3;
+    --sand:#3A382F;
+    --hair:#332F29;
+    --alarm:#D3A183;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#1B1A17;
+  --surface:#232220;
+  --sunk:#2A2925;
+  --ink:#EFEAE1;
+  --ink-soft:#BDB6AA;
+  --ink-faint:#948D82;
+  --olive:#A7B689;
+  --olive-bright:#BECBA3;
+  --sand:#3A382F;
+  --hair:#332F29;
+  --alarm:#D3A183;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:17px;
+  line-height:1.62;
+  -webkit-font-smoothing:antialiased;
+}
+.page{max-width:47rem;margin:0 auto;padding:clamp(28px,6vw,64px) clamp(18px,5vw,32px) 96px}
+
+/* ——— шапка ——— */
+.top{border-bottom:1px solid var(--hair);padding-bottom:28px}
+.kicker{
+  font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--olive);font-weight:600;margin:0;
+}
+h1{
+  font-family:var(--serif);font-weight:500;
+  font-size:clamp(2.3rem,7vw,3.2rem);line-height:1.08;
+  margin:.35em 0 0;text-wrap:balance;
+}
+.top p{margin:.9rem 0 0;color:var(--ink-soft);max-width:34rem}
+
+/* ——— оглавление ——— */
+nav{margin-top:32px;display:flex;flex-wrap:wrap;gap:8px}
+nav a{
+  font-size:.87rem;color:var(--ink-soft);text-decoration:none;
+  border:1px solid var(--hair);border-radius:100px;padding:7px 14px;
+  background:var(--surface);transition:border-color .2s,color .2s;
+}
+nav a:hover,nav a:focus-visible{border-color:var(--olive);color:var(--olive)}
+
+/* ——— разделы ——— */
+section{margin-top:56px;scroll-margin-top:20px}
+h2{
+  font-family:var(--serif);font-weight:500;
+  font-size:clamp(1.55rem,4.4vw,2rem);line-height:1.16;
+  margin:0 0 4px;text-wrap:balance;
+}
+.lede{color:var(--ink-soft);margin:0 0 20px;max-width:36rem}
+h3{
+  font-size:.95rem;font-weight:600;margin:28px 0 8px;
+  color:var(--ink);letter-spacing:.01em;
+}
+p{margin:0 0 14px;max-width:38rem}
+ul,ol{margin:0 0 16px;padding-left:1.25em;max-width:38rem}
+li{margin-bottom:8px}
+strong{font-weight:600}
+a{color:var(--olive);text-underline-offset:3px}
+code{
+  font-family:var(--mono);font-size:.86em;
+  background:var(--sunk);border:1px solid var(--hair);
+  border-radius:5px;padding:1px 5px;
+}
+
+/* ——— ссылки-адреса ——— */
+.addr{
+  display:block;font-family:var(--mono);font-size:.84rem;
+  background:var(--sunk);border:1px solid var(--hair);border-radius:10px;
+  padding:12px 14px;margin:0 0 12px;word-break:break-all;
+  color:var(--ink);text-decoration:none;
+}
+.addr:hover{border-color:var(--olive)}
+.addr b{color:var(--olive);font-weight:600}
+
+/* ——— карточка-подсказка ——— */
+.hint{
+  background:var(--surface);border:1px solid var(--hair);
+  border-radius:14px;padding:18px 20px;margin:22px 0;
+}
+.hint--warn{background:color-mix(in srgb, var(--alarm) 9%, var(--surface));border-color:color-mix(in srgb, var(--alarm) 28%, var(--hair))}
+.hint p:last-child{margin-bottom:0}
+.hint .label{
+  font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--olive);font-weight:600;margin:0 0 6px;
+}
+.hint--warn .label{color:var(--alarm)}
+
+/* ——— шаги ——— */
+.steps{list-style:none;padding:0;margin:0;counter-reset:s}
+.steps li{
+  counter-increment:s;position:relative;padding-left:44px;margin-bottom:18px;
+}
+.steps li::before{
+  content:counter(s);position:absolute;left:0;top:-1px;
+  width:28px;height:28px;border-radius:50%;
+  border:1px solid var(--sand);color:var(--olive);
+  font-family:var(--serif);font-size:.95rem;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ——— таблица ——— */
+.tablewrap{overflow-x:auto;margin:0 0 18px}
+table{width:100%;border-collapse:collapse;font-size:.92rem;min-width:24rem}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--hair);vertical-align:top}
+th{
+  font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--olive);font-weight:600;
+}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:0}
+
+.foot{
+  margin-top:72px;padding-top:24px;border-top:1px solid var(--hair);
+  color:var(--ink-faint);font-size:.86rem;
+}
+:focus-visible{outline:2px solid var(--olive);outline-offset:3px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01ms !important}}
+</style>
+
+<div class="page">
+
+<header class="top">
+  <p class="kicker">Рабочая шпаргалка</p>
+  <h1>Как вести «Мой ритм»</h1>
+  <p>Всё, что нужно перед выступлением и после него: откуда брать ссылки, как сделать QR, где смотреть статистику и как честно читать цифры.</p>
+</header>
+
+<nav>
+  <a href="#links">Ссылки</a>
+  <a href="#qr">QR-коды</a>
+  <a href="#scene">Что сказать со сцены</a>
+  <a href="#stats">Статистика</a>
+  <a href="#read">Как читать цифры</a>
+  <a href="#privacy">Вопросы о данных</a>
+  <a href="#trouble">Если что-то не так</a>
+</nav>
+
+<section id="links">
+  <h2>Ссылки для выступлений</h2>
+  <p class="lede">Основной адрес приложения один. Хвостик <code>?source=</code> в конце говорит, с какого выступления пришла женщина.</p>
+
+  <a class="addr" href="https://gaudialis55.github.io/moy-ritm-segodnya/">https://gaudialis55.github.io/moy-ritm-segodnya/</a>
+
+  <p>Для каждого мероприятия делается своя ссылка — просто дописываете хвостик:</p>
+
+  <a class="addr" href="https://gaudialis55.github.io/moy-ritm-segodnya/?source=womenclub">https://gaudialis55.github.io/moy-ritm-segodnya/<b>?source=womenclub</b></a>
+  <a class="addr" href="https://gaudialis55.github.io/moy-ritm-segodnya/?source=business">https://gaudialis55.github.io/moy-ritm-segodnya/<b>?source=business</b></a>
+  <a class="addr" href="https://gaudialis55.github.io/moy-ritm-segodnya/?source=banya">https://gaudialis55.github.io/moy-ritm-segodnya/<b>?source=banya</b></a>
+
+  <h3>Как назвать источник</h3>
+  <ul>
+    <li>Только латинские буквы, цифры, дефис и подчёркивание — <code>moms</code>, <code>wellness-2</code>, <code>club_spb</code>.</li>
+    <li>Без пробелов, кириллицы и точек — такое имя приложение отбросит.</li>
+    <li>Короткое и понятное вам: вы увидите его в таблице статистики.</li>
+    <li>Для каждого мероприятия — своё, даже если аудитория похожая. Иначе не отличить, где сработало лучше.</li>
+  </ul>
+
+  <div class="hint">
+    <p class="label">Как это работает</p>
+    <p>Источник запоминается на телефоне женщины при первом заходе. Даже если завтра она откроет приложение из истории браузера — без хвостика, — её возврат всё равно засчитается вашему клубу.</p>
+  </div>
+</section>
+
+<section id="qr">
+  <h2>QR-код на слайд</h2>
+  <p class="lede">Никаких специальных сервисов не нужно, подойдёт любой бесплатный генератор без регистрации.</p>
+
+  <ol class="steps">
+    <li><strong>Скопируйте готовую ссылку</strong> с нужным хвостиком <code>?source=</code>.</li>
+    <li><strong>Откройте генератор</strong> — например <a href="https://qr.io" target="_blank" rel="noopener noreferrer">qr.io</a>, <a href="https://www.qr-code-generator.com" target="_blank" rel="noopener noreferrer">qr-code-generator.com</a> или встроенный в Canva.</li>
+    <li><strong>Вставьте ссылку целиком</strong>, вместе с хвостиком. Это главное: без него потеряется, откуда пришли женщины.</li>
+    <li><strong>Скачайте картинку</strong> в PNG или SVG. Для слайда лучше SVG — не рассыпется при увеличении.</li>
+    <li><strong>Проверьте своим телефоном</strong> прямо с экрана презентации: наведите камеру и убедитесь, что открылось приложение, а в адресе виден ваш <code>?source=</code>.</li>
+  </ol>
+
+  <div class="hint">
+    <p class="label">Чтобы считалось с любого места зала</p>
+    <p>Код на слайде — не меньше четверти высоты экрана. Тёмный код на белом фоне, без картинки под ним. Рядом крупно продублируйте адрес словами: у кого-то не работает камера, кто-то сидит далеко.</p>
+  </div>
+
+  <div class="hint hint--warn">
+    <p class="label">Частая ошибка</p>
+    <p>Сокращатели ссылок вроде clck.ru иногда режут хвостик <code>?source=</code>. Если пользуетесь ими — обязательно проверьте, что после перехода хвостик остался в адресе.</p>
+  </div>
+</section>
+
+<section id="scene">
+  <h2>Что сказать со сцены</h2>
+  <p class="lede">Две фразы, которые заметно влияют на то, что вы потом увидите в статистике.</p>
+
+  <h3>Попросите добавить на домашний экран</h3>
+  <p>Это не про удобство, а про сохранность. Если женщина просто откроет сайт в Safari и неделю туда не зайдёт, айфон сам сотрёт её историю — и вернувшаяся через неделю посчитается новым человеком. Добавленное на домашний экран приложение живёт дольше.</p>
+  <p><strong>iPhone:</strong> кнопка «Поделиться» → «На экран «Домой».<br>
+  <strong>Android:</strong> меню «⋮» → «Добавить на главный экран».</p>
+
+  <h3>Скажите про вечер</h3>
+  <p>Вечерний check-in — самая ценная часть: именно он показывает, изменилось ли что-то после рекомендации. Женщины про него узнают, только если вы скажете: «вечером зайдите ещё раз, там три коротких вопроса».</p>
+
+  <div class="hint">
+    <p class="label">Одной фразой</p>
+    <p>«Наведите камеру, добавьте на домашний экран и вечером загляните ещё раз — там будет три коротких вопроса о том, как прошёл день».</p>
+  </div>
+</section>
+
+<section id="stats">
+  <h2>Где смотреть статистику</h2>
+  <p class="lede">Отдельная страница, закрытая паролем. Открывается с телефона и с компьютера.</p>
+
+  <a class="addr" href="https://gaudialis55.github.io/panel-t9v8307s/">https://gaudialis55.github.io/panel-t9v8307s/</a>
+
+  <p>Вход — ваша почта <code>4anna_che@mail.ru</code> и пароль, который вам передали. Один раз войдёте — дальше страница будет открываться сразу.</p>
+  <p>Удобно добавить её на домашний экран рядом с самим приложением: тогда статистика открывается в одно касание.</p>
+
+  <h3>Что показывает каждая строка</h3>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Строка</th><th>Что означает</th></tr></thead>
+      <tbody>
+        <tr><td>Открыли сайт</td><td>Сколько человек зашло по ссылке или QR</td></tr>
+        <tr><td>Начали опрос</td><td>Нажали «Узнать свой ритм» и ввели данные цикла</td></tr>
+        <tr><td>Дошли до результата</td><td>Ответили на все пять вопросов и увидели свой режим дня</td></tr>
+        <tr><td>Решили попробовать</td><td>Нажали «Попробую сегодня» — то есть собрались что-то изменить</td></tr>
+        <tr><td>Открыли вечерний check-in</td><td>Вернулись вечером</td></tr>
+        <tr><td>Завершили вечерний check-in</td><td>Ответили на три вечерних вопроса</td></tr>
+        <tr><td>Вернулись на следующий день</td><td>Открыли приложение на другой день</td></tr>
+        <tr><td>Пользуются через неделю</td><td>Зашли на седьмой день или позже</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Ниже — таблица по источникам: та же воронка отдельно для каждого выступления. И два блока с оценками самих женщин: насколько результат совпал с их состоянием и помогла ли рекомендация.</p>
+
+  <h3>Выгрузка</h3>
+  <p>Кнопка «Скачать CSV» сохраняет все события файлом — его можно открыть в Excel или прислать мне, если захочется посчитать что-то своё.</p>
+</section>
+
+<section id="read">
+  <h2>Как читать цифры честно</h2>
+  <p class="lede">Три вещи, которые уберегут от неверных выводов на маленьких числах.</p>
+
+  <h3>Смотрите на переходы, а не на первую строку</h3>
+  <p>«42 человека открыли» не значит почти ничего: люди наводят камеру из любопытства. Важнее, сколько из них дошло до результата, сколько решило попробовать и сколько вернулось назавтра. Главный вопрос всего пилота — <strong>захотелось ли открыть второй раз</strong>.</p>
+
+  <h3>На сорока участницах проценты обманывают</h3>
+  <p>Разница между 15% и 25% возврата при таких числах — случайность, а не сигнал. Ориентируйтесь на порядок величины и на кратную разницу между аудиториями: если ЗОЖ-клуб возвращается вдвое чаще бизнес-клуба, это уже разговор.</p>
+
+  <h3>Айфоны занижают неделю</h3>
+  <p>Safari стирает данные сайта после недели без визитов. Поэтому строка «Пользуются через неделю» всегда будет скромнее правды, а часть вернувшихся попадёт в «Открыли сайт» как новые. Отсюда и просьба со сцены добавлять на домашний экран.</p>
+
+  <div class="hint">
+    <p class="label">Что считать успехом</p>
+    <p>Если женщины возвращаются на следующий день сами, без вашего личного «ну зайди ещё раз» — метод работает, можно строить продукт дальше. Если не возвращаются даже те, кому результат «очень похож», — дело не в интерфейсе, а в самой идее ежедневной сверки.</p>
+  </div>
+</section>
+
+<section id="privacy">
+  <h2>Если спросят про данные</h2>
+  <p class="lede">Спросят обязательно — тема чувствительная. Отвечать можно прямо, потому что так и устроено.</p>
+
+  <h3>Что остаётся у женщины на телефоне</h3>
+  <p>Дата последней менструации, длина цикла, все ответы о самочувствии, вечерние заметки, вся её история. Это не отправляется никуда и не видно ни вам, ни мне.</p>
+
+  <h3>Что приходит вам</h3>
+  <p>Только обезличенные отметки: «кто-то открыл сайт», «кто-то дошёл до результата», «кто-то вернулся на второй день» — с датой и названием источника. Ни имени, ни телефона, ни дня цикла, ни ответов. По этим данным нельзя понять, кто именно и что именно про себя написал.</p>
+
+  <div class="hint">
+    <p class="label">Короткий ответ на вопрос из зала</p>
+    <p>«Приложение не спрашивает имя, почту и телефон. Всё про цикл и самочувствие остаётся в твоём телефоне. Я вижу только, сколько всего человек открыло, дошло и вернулось — без имён и без содержания ответов».</p>
+  </div>
+
+  <p>В самом приложении есть страница «Что происходит с моими данными» и кнопка «Удалить мои данные с устройства» — можно смело показывать её со сцены.</p>
+</section>
+
+<section id="trouble">
+  <h2>Если что-то пошло не так</h2>
+
+  <h3>QR открывается, а статистика пустая</h3>
+  <p>Проверьте, что в ссылке остался хвостик <code>?source=</code>. Если его срезал сокращатель — события ушли в общий источник <code>direct</code>, они не потерялись, просто не привязались к выступлению.</p>
+
+  <h3>Не пускает в статистику</h3>
+  <p>Проверьте раскладку и регистр почты. После нескольких неудачных попыток вход временно блокируется — подождите пять минут. Если не помогло, напишите мне: пароль сбрасывается за минуту.</p>
+
+  <h3>Цифры не меняются</h3>
+  <p>Нажмите «Обновить» на странице статистики. События приходят сразу, но страница не перезагружается сама.</p>
+
+  <h3>Женщина говорит, что потеряла свою историю</h3>
+  <p>Скорее всего, она открыла приложение в другом браузере или почистила данные сайта. История хранится только на устройстве и не восстанавливается — это плата за то, что мы ничего о ней не собираем.</p>
+</section>
+
+<p class="foot">Приложение: <a href="https://gaudialis55.github.io/moy-ritm-segodnya/">gaudialis55.github.io/moy-ritm-segodnya</a> · Статистика: <a href="https://gaudialis55.github.io/panel-t9v8307s/">gaudialis55.github.io/panel-t9v8307s</a></p>
+
+</div>
