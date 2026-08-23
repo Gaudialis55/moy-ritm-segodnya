@@ -390,6 +390,71 @@ input:focus,select:focus,textarea:focus{border-color:var(--olive);outline:none;b
   .mode-name--transition{font-size:1.5rem}
   .phase-day{font-size:2.5rem}
 }
+
+/* =========================================================
+   ПРЕАМБУЛА ПЕРВОГО ЭКРАНА
+   ========================================================= */
+.project-intro{margin-top:18px;font-size:.98rem;line-height:1.62;color:var(--ink-soft)}
+.project-intro strong{color:var(--ink);font-weight:500}
+
+.about-project{width:100%;margin-top:22px;border-top:1px solid var(--sand-soft);border-bottom:1px solid var(--sand-soft)}
+.about-project summary{
+  list-style:none;cursor:pointer;padding:17px 2px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  font-size:.92rem;color:var(--olive-deep);font-weight:500;
+}
+.about-project summary::-webkit-details-marker{display:none}
+.about-project summary::after{
+  content:"+";font-family:var(--serif);font-size:1.5rem;font-weight:300;line-height:1;color:var(--olive);
+}
+.about-project[open] summary::after{content:"−"}
+.about-body{padding:2px 0 22px}
+.about-text{font-size:.91rem;line-height:1.65;color:var(--ink-soft)}
+.about-text strong{color:var(--ink);font-weight:500}
+
+.how-it-works{margin-top:24px}
+.mini-title{margin-bottom:12px;font-family:var(--serif);font-size:1.28rem;color:var(--ink)}
+.how-step{display:flex;gap:12px;margin:12px 0;align-items:flex-start}
+.how-number{
+  flex:0 0 25px;width:25px;height:25px;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--sand-soft);border-radius:50%;
+  font-family:var(--serif);font-size:.86rem;color:var(--olive-deep);
+}
+.how-copy{font-size:.88rem;line-height:1.52;color:var(--ink-soft)}
+.how-copy strong{color:var(--ink);font-weight:500}
+
+.phases-mini{margin-top:26px;display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.phase-mini{padding:15px 13px;background:var(--card);border:1px solid var(--sand-soft);border-radius:var(--radius-sm)}
+.phase-mini-icon{display:block;font-size:1.15rem;margin-bottom:7px}
+.phase-mini-name{display:block;font-family:var(--serif);font-size:1rem;color:var(--ink);line-height:1.2}
+.phase-mini-mode{
+  display:block;margin-top:4px;font-size:.68rem;line-height:1.25;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--olive);
+}
+.phase-mini-text{display:block;margin-top:8px;font-size:.77rem;line-height:1.45;color:var(--ink-soft)}
+
+.rhythm-principle{
+  margin-top:20px;padding:17px;
+  background:rgba(147,161,131,.12);border-radius:var(--radius-sm);
+  font-size:.86rem;line-height:1.58;color:var(--ink-soft);
+}
+.rhythm-principle strong{color:var(--olive-deep);font-weight:500}
+
+.author-about{margin-top:22px;padding-top:20px;border-top:1px solid var(--sand-soft)}
+.author-about-name{font-family:var(--serif);font-size:1.16rem;color:var(--ink)}
+.author-about-role{margin-top:6px;font-size:.82rem;line-height:1.5;color:var(--ink-soft)}
+.author-about-text{margin-top:12px;font-size:.86rem;line-height:1.58;color:var(--ink-soft)}
+.author-about a{color:var(--olive);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--sand)}
+.author-about a:hover{text-decoration-color:var(--olive)}
+
+.claim{margin-top:10px}
+.claim strong{color:var(--olive-deep);font-weight:500}
+
+/* на очень узком экране фазы одной колонкой */
+@media (max-width:350px){
+  .phases-mini{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -397,17 +462,134 @@ input:focus,select:focus,textarea:focus{border-color:var(--olive);outline:none;b
 
 <!-- ЭКРАН 1 — приветствие -->
 <section class="screen" id="s-welcome" aria-labelledby="welcome-title">
-  <div class="spacer"></div>
+
   <p class="eyebrow">Ежедневная практика</p>
+
   <h1 id="welcome-title" class="mt-s">Мой ритм<br>сегодня</h1>
-  <p class="lede mt-m" id="welcome-lede">2 минуты, чтобы понять, какого режима сегодня просит твоё тело.</p>
-  <div class="spacer"></div>
-  <button class="btn" id="welcome-primary">Начать</button>
+
+  <p class="lede mt-m" id="welcome-lede">
+    2 минуты, чтобы понять, какого режима сегодня просит твоё тело.
+  </p>
+
+  <p class="project-intro">
+    Женское состояние в течение месяца может меняться:
+    в одни дни легче <strong>создавать и проявляться</strong>,
+    в другие — <strong>завершать, замедляться и восстанавливаться</strong>.
+    <br><br>
+    «Мой ритм сегодня» сопоставляет <strong>ориентировочную фазу цикла</strong>
+    с тем, что ты действительно чувствуешь сегодня.
+  </p>
+
+  <button class="btn mt-l" id="welcome-primary">Узнать свой ритм</button>
   <button class="btn btn-ghost mt-s" id="welcome-secondary" hidden></button>
   <button class="btn-text center mt-s" data-go="history" id="welcome-history" hidden>Мой ритм</button>
-  <button class="btn-text center" data-go="privacy">Что происходит с моими данными</button>
-  <p class="muted center mt-l">Мы не спрашиваем имя, почту и телефон.<br>Всё остаётся на твоём устройстве.</p>
-  <p class="muted center author">Идея и воплощение — Анна,<br>автор канала <a href="https://t.me/anna_vkuszhizni" target="_blank" rel="noopener noreferrer">«Вкус жизни»</a></p>
+
+  <!-- ПОДРОБНЕЕ О ПРОЕКТЕ -->
+  <details class="about-project">
+    <summary>Что это и как работает</summary>
+    <div class="about-body">
+
+      <p class="about-text">
+        Это не календарь, который говорит, какой ты <em>должна</em> быть
+        в определённый день. Цикл здесь — только одна из подсказок.
+        <br><br>
+        Сначала мы смотрим на <strong>твоё реальное состояние</strong>,
+        а уже потом сопоставляем его с фазой цикла.
+      </p>
+
+      <div class="how-it-works">
+        <p class="mini-title">Как это работает</p>
+
+        <div class="how-step">
+          <span class="how-number">1</span>
+          <div class="how-copy"><strong>Сверяемся с циклом.</strong><br>Определяем ориентировочную фазу.</div>
+        </div>
+        <div class="how-step">
+          <span class="how-number">2</span>
+          <div class="how-copy"><strong>Слушаем тело.</strong><br>Несколько простых вопросов о твоём состоянии сегодня.</div>
+        </div>
+        <div class="how-step">
+          <span class="how-number">3</span>
+          <div class="how-copy"><strong>Определяем режим.</strong><br>Создавать, проявлять, собирать или интегрировать.</div>
+        </div>
+        <div class="how-step">
+          <span class="how-number">4</span>
+          <div class="how-copy"><strong>Выбираем действия.</strong><br>Работа, общение, движение, питание и восстановление.</div>
+        </div>
+        <div class="how-step">
+          <span class="how-number">5</span>
+          <div class="how-copy"><strong>Наблюдаем.</strong><br>Постепенно собираем не усреднённую женщину, а твой собственный ритм.</div>
+        </div>
+      </div>
+
+      <p class="mini-title" style="margin-top:28px">Четыре фазы цикла</p>
+
+      <div class="phases-mini">
+        <div class="phase-mini">
+          <span class="phase-mini-icon">🌱</span>
+          <span class="phase-mini-name">Фолликулярная</span>
+          <span class="phase-mini-mode">Создавать</span>
+          <span class="phase-mini-text">Период после менструации. Возможный фокус — новое, идеи, любопытство и начало.</span>
+        </div>
+        <div class="phase-mini">
+          <span class="phase-mini-icon">🌺</span>
+          <span class="phase-mini-name">Овуляторная</span>
+          <span class="phase-mini-mode">Проявлять</span>
+          <span class="phase-mini-text">Период вокруг овуляции. Возможный фокус — взаимодействие, общение и проявление.</span>
+        </div>
+        <div class="phase-mini">
+          <span class="phase-mini-icon">🍂</span>
+          <span class="phase-mini-name">Лютеиновая</span>
+          <span class="phase-mini-mode">Собирать</span>
+          <span class="phase-mini-text">Период после овуляции. Возможный фокус — анализ, порядок, завершение и границы.</span>
+        </div>
+        <div class="phase-mini">
+          <span class="phase-mini-icon">🌑</span>
+          <span class="phase-mini-name">Менструальная</span>
+          <span class="phase-mini-mode">Интегрировать</span>
+          <span class="phase-mini-text">Начало нового цикла. Возможный фокус — пауза, восстановление и переосмысление.</span>
+        </div>
+      </div>
+
+      <div class="rhythm-principle">
+        <strong>Главное: это не инструкция.</strong><br>
+        Если состояние тела не совпадает с ожидаемой фазой, мы не пытаемся тебя «исправить».
+        Приоритет всегда у того, что ты действительно ощущаешь сегодня.
+      </div>
+
+      <div class="author-about">
+        <p class="eyebrow">Об авторе</p>
+        <p class="author-about-name mt-s">Анна Мартынюк</p>
+        <p class="author-about-role">
+          Автор проекта женского восстановления «Вкус жизни» · коуч ICF ·
+          нутрициолог · специалист по телесным и банным практикам
+        </p>
+        <p class="author-about-text">
+          Я исследую, как женщина может выстраивать работу, нагрузку и восстановление
+          не вопреки своему состоянию, а в сотрудничестве с телом.
+          <br><br>
+          «Мой ритм сегодня» — экспериментальная часть этой методики.
+        </p>
+        <p class="author-about-text">
+          <a href="https://t.me/anna_vkuszhizni" target="_blank" rel="noopener noreferrer">Канал «Вкус жизни»</a>
+        </p>
+      </div>
+
+    </div>
+  </details>
+
+  <p class="muted center mt-l">
+    Мы не спрашиваем имя, почту и телефон.<br>
+    Данные о цикле и состоянии остаются на твоём устройстве.
+  </p>
+
+  <p class="muted center claim">
+    Не жить по циклу.<br>
+    <strong>Учиться слышать свой.</strong>
+  </p>
+
+  <button class="btn-text center mt-s" data-go="privacy">Что происходит с моими данными</button>
+
 </section>
 
 <!-- ЭКРАН 2 — данные цикла -->
@@ -1471,13 +1653,22 @@ function renderWelcome(todayEntry) {
   var secondary = $("#welcome-secondary");
   var historyBtn = $("#welcome-history");
 
+  var intro = $(".project-intro");
+  var about = $(".about-project");
+
   if (!hasProfile) {
     lede.textContent = "2 минуты, чтобы понять, какого режима сегодня просит твоё тело.";
-    primary.textContent = "Начать";
+    primary.textContent = "Узнать свой ритм";
     secondary.hidden = true;
     historyBtn.hidden = true;
+    if (intro) intro.hidden = false;
+    if (about) about.hidden = false;
     return;
   }
+
+  // вернувшейся женщине объяснение проекта каждый день не нужно
+  if (intro) intro.hidden = true;
+  if (about) about.hidden = true;
 
   if (todayEntry && todayEntry.mode) {
     lede.textContent = "С возвращением. Сегодняшний день уже отмечен — можно вернуться к нему или пройти заново.";
