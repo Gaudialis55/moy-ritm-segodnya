@@ -1,0 +1,1736 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FAF8F4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="description" content="Мой ритм сегодня — две минуты, чтобы понять, какого режима сегодня просит твоё тело.">
+<title>Мой ритм сегодня</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAF8F4;
+  --card:#FFFDFA;
+  /* оттенки подобраны так, чтобы текст на тёплом белом проходил WCAG AA */
+  --olive:#66714F;
+  --olive-deep:#4E5842;
+  --sage:#93A183;        /* только декор: точки, границы */
+  --sage-deep:#5F6A4C;   /* шалфейный для мелких надписей */
+  --sand:#D9CFC0;
+  --sand-soft:#EDE6DC;
+  --ink:#3A3733;
+  --ink-soft:#615B54;
+  --ink-faint:#736D64;
+  --terra:#C08A6E;
+  --radius:20px;
+  --radius-sm:14px;
+  --shadow:0 1px 2px rgba(58,55,51,.04), 0 8px 24px rgba(58,55,51,.05);
+  --serif:"Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --sans:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{box-sizing:border-box}
+/* без этого display:block у кнопок перебивает атрибут hidden */
+[hidden]{display:none !important}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:16px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  min-height:100vh;
+}
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(60% 40% at 12% 0%, rgba(147,161,131,.13), transparent 70%),
+    radial-gradient(50% 35% at 95% 8%, rgba(217,207,192,.35), transparent 72%),
+    radial-gradient(70% 45% at 50% 100%, rgba(192,138,110,.07), transparent 75%);
+  pointer-events:none;
+  z-index:0;
+}
+.app{
+  position:relative;
+  z-index:1;
+  max-width:420px;
+  margin:0 auto;
+  padding:0 22px calc(40px + env(safe-area-inset-bottom));
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+.screen{display:none;flex:1;flex-direction:column;padding-top:28px}
+.screen.is-active{display:flex;animation:rise .42s var(--ease) both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+
+h1,h2,h3{font-family:var(--serif);font-weight:500;letter-spacing:.01em;margin:0}
+h1{font-size:2.5rem;line-height:1.14}
+h2{font-size:1.72rem;line-height:1.22}
+h3{font-size:1.18rem;line-height:1.3}
+p{margin:0}
+.lede{color:var(--ink-soft);font-size:1.02rem;line-height:1.6}
+.muted{color:var(--ink-faint);font-size:.85rem;line-height:1.5}
+.eyebrow{
+  font-size:.72rem;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--sage-deep);
+  font-weight:600;
+}
+
+/* ——— кнопки ——— */
+.btn{
+  -webkit-appearance:none;appearance:none;
+  display:block;width:100%;
+  min-height:54px;
+  padding:15px 22px;
+  border:0;border-radius:100px;
+  background:var(--olive);
+  color:#FFFFFF;
+  font-family:var(--sans);
+  font-size:1rem;font-weight:500;letter-spacing:.01em;
+  cursor:pointer;
+  transition:background .25s var(--ease), transform .18s var(--ease);
+}
+.btn:hover{background:var(--olive-deep)}
+.btn:active{transform:scale(.985)}
+.btn-ghost{
+  background:transparent;
+  color:var(--olive);
+  border:1px solid var(--sand);
+  min-height:50px;
+}
+.btn-ghost:hover{background:var(--sand-soft)}
+.btn-text{
+  -webkit-appearance:none;appearance:none;
+  background:none;border:0;
+  color:var(--ink-soft);
+  font-family:var(--sans);font-size:.92rem;
+  padding:12px 8px;
+  cursor:pointer;
+  text-decoration:underline;
+  text-underline-offset:4px;
+  text-decoration-color:var(--sand);
+  transition:color .2s var(--ease);
+}
+.btn-text:hover{color:var(--olive)}
+:focus-visible{outline:2px solid var(--olive);outline-offset:3px;border-radius:6px}
+/* заголовок получает фокус программно при смене экрана — это для читалок,
+   рамка вокруг него человеку не нужна */
+[tabindex="-1"]:focus,[tabindex="-1"]:focus-visible{outline:none}
+
+/* ——— шапка с прогрессом ——— */
+.topbar{
+  display:flex;align-items:center;gap:14px;
+  min-height:48px;
+  margin-bottom:24px;
+}
+.back{
+  -webkit-appearance:none;appearance:none;
+  background:none;border:0;
+  width:46px;height:46px;margin-left:-13px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--ink-soft);
+  border-radius:50%;
+  transition:background .2s var(--ease)}
+.back:hover{background:var(--sand-soft)}
+.dots{display:flex;gap:7px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--sand);transition:all .3s var(--ease)}
+.dot.is-done{background:var(--sage)}
+.dot.is-now{background:var(--olive);width:20px;border-radius:100px}
+
+/* ——— карточки-ответы ——— */
+.options{display:flex;flex-direction:column;gap:10px;margin-top:26px}
+.option{
+  -webkit-appearance:none;appearance:none;
+  display:block;width:100%;
+  text-align:left;
+  min-height:56px;
+  padding:16px 18px;
+  background:var(--card);
+  border:1px solid var(--sand-soft);
+  border-radius:var(--radius-sm);
+  color:var(--ink);
+  font-family:var(--sans);font-size:.99rem;line-height:1.45;
+  cursor:pointer;
+  transition:border-color .22s var(--ease), background .22s var(--ease), transform .18s var(--ease);
+}
+.option:hover{border-color:var(--sage);background:#fff}
+.option:active{transform:scale(.99)}
+.option.is-picked{
+  border-color:var(--olive);
+  background:#E7EDDA;
+  box-shadow:inset 0 0 0 2px var(--olive);
+  color:var(--olive-deep);
+  font-weight:500;
+}
+
+/* ——— форма ——— */
+.field{margin-bottom:22px}
+.field label,.field .label{
+  display:block;
+  font-size:.88rem;font-weight:500;
+  color:var(--ink-soft);
+  margin-bottom:9px;
+}
+input[type=date],input[type=number],select,textarea{
+  -webkit-appearance:none;appearance:none;
+  width:100%;
+  min-height:52px;
+  padding:14px 16px;
+  background:var(--card);
+  border:1px solid var(--sand-soft);
+  border-radius:var(--radius-sm);
+  font-family:var(--sans);font-size:1rem;
+  color:var(--ink);
+  transition:border-color .2s var(--ease);
+}
+select{
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236B655E' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 16px center;
+  padding-right:42px;
+}
+textarea{min-height:96px;resize:vertical;line-height:1.5}
+/* свой выбор даты: нативный календарь браузера показывается на языке
+   интерфейса браузера, а нам нужен русский на любом устройстве */
+.date-row{display:flex;gap:8px}
+.date-row select{min-width:0;padding-right:34px;background-position:right 12px center}
+#f-day{flex:0 0 78px}
+#f-month{flex:1 1 auto}
+#f-year{flex:0 0 92px}
+/* на узких экранах «Сентябрь» в одну строку с днём и годом уже не помещается */
+@media (max-width:359px){
+  .date-row{flex-direction:column}
+  #f-day,#f-month,#f-year{flex:1 1 auto}
+}
+input:focus,select:focus,textarea:focus{border-color:var(--olive);outline:none;box-shadow:0 0 0 3px rgba(110,122,92,.1)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{
+  -webkit-appearance:none;appearance:none;
+  flex:1 1 auto;
+  min-height:48px;padding:12px 16px;
+  background:var(--card);
+  border:1px solid var(--sand-soft);
+  border-radius:100px;
+  font-family:var(--sans);font-size:.93rem;color:var(--ink-soft);
+  cursor:pointer;
+  transition:all .2s var(--ease);
+}
+.chip:hover{border-color:var(--sage)}
+.chip.is-picked{background:var(--olive);border-color:var(--olive);color:#FFFFFF;font-weight:500}
+.note{
+  margin-top:14px;
+  padding:13px 16px;
+  border-radius:var(--radius-sm);
+  background:rgba(192,138,110,.09);
+  color:#6E4830;
+  font-size:.87rem;line-height:1.5;
+}
+.note[hidden]{display:none}
+
+/* ——— результат ——— */
+.card{
+  background:var(--card);
+  border:1px solid var(--sand-soft);
+  border-radius:var(--radius);
+  padding:22px;
+  box-shadow:var(--shadow);
+}
+.phase-card{
+  text-align:center;
+  padding:26px 22px;
+  background:linear-gradient(168deg,#F5F6F0 0%, var(--card) 62%);
+}
+.phase-day{font-family:var(--serif);font-size:2.9rem;line-height:1;color:var(--olive-deep)}
+.phase-name{font-family:var(--serif);font-size:1.45rem;margin-top:6px;color:var(--ink)}
+.mode-card{margin-top:14px;text-align:center;padding:28px 22px}
+.mode-name{
+  font-family:var(--serif);
+  font-size:2.35rem;line-height:1.1;
+  color:var(--olive-deep);
+  letter-spacing:.02em;
+}
+.mode-name .arrow{color:var(--sage);font-size:1.5rem;vertical-align:middle}
+/* переходный режим — два слова со стрелкой, кегль меньше, чтобы помещалось на телефоне */
+.mode-name--transition{font-size:1.95rem;line-height:1.22}
+.align{
+  margin-top:14px;
+  padding:17px 20px;
+  border-radius:var(--radius-sm);
+  font-size:.94rem;line-height:1.55;
+  border:1px solid transparent;
+}
+.align--aligned{background:rgba(147,161,131,.15);border-color:rgba(147,161,131,.35);color:#3D4734}
+.align--partial{background:rgba(217,207,192,.32);border-color:var(--sand);color:#554C40}
+.align--divergent{background:rgba(192,138,110,.14);border-color:rgba(192,138,110,.35);color:#6E4830}
+.recs{margin-top:14px;padding:6px 22px}
+.rec{padding:17px 0;border-bottom:1px solid var(--sand-soft)}
+.rec:last-child{border-bottom:0}
+.rec-label{
+  font-size:.71rem;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--sage-deep);font-weight:600;margin-bottom:5px;
+}
+.rec-text{font-size:.97rem;line-height:1.55;color:var(--ink)}
+.rec-extra{margin-top:7px;font-size:.9rem;color:var(--ink-soft);font-style:italic}
+.coach{
+  margin-top:14px;
+  text-align:center;
+  padding:30px 24px;
+  background:linear-gradient(168deg,#F5F6F0 0%, var(--card) 70%);
+}
+.coach q{
+  display:block;
+  font-family:var(--serif);
+  font-size:1.5rem;line-height:1.35;
+  color:var(--olive-deep);
+  font-style:italic;
+  quotes:"«" "»";
+}
+.stack{display:flex;flex-direction:column;gap:12px;margin-top:26px}
+.disclaimer{margin-top:26px;text-align:center}
+
+/* ——— история ——— */
+.entry{
+  background:var(--card);
+  border:1px solid var(--sand-soft);
+  border-radius:var(--radius-sm);
+  padding:17px 19px;
+  margin-bottom:10px;
+}
+.entry-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.entry-date{font-size:.87rem;color:var(--ink-soft)}
+.entry-mode{font-family:var(--serif);font-size:1.22rem;color:var(--olive-deep)}
+.entry-meta{margin-top:5px;font-size:.83rem;color:var(--ink-faint)}
+.entry-evening{
+  margin-top:12px;padding-top:12px;
+  border-top:1px solid var(--sand-soft);
+  font-size:.88rem;color:var(--ink-soft);line-height:1.5;
+}
+.entry-evening b{font-weight:500;color:var(--ink)}
+.badge{
+  display:inline-block;
+  padding:2px 9px;border-radius:100px;
+  font-size:.72rem;font-weight:500;
+  vertical-align:1px;
+}
+.badge--aligned{background:rgba(147,161,131,.22);color:#3D4734}
+.badge--partial{background:rgba(217,207,192,.5);color:#554C40}
+.badge--divergent{background:rgba(192,138,110,.2);color:#6E4830}
+.empty{text-align:center;padding:50px 20px;color:var(--ink-faint)}
+
+/* подпись автора: тон тот же, что у остальных пояснений, но ссылка заметна */
+.author{margin-top:14px;line-height:1.95}   /* строки пореже — по ссылке легче попасть пальцем */
+.author a{
+  color:var(--olive);
+  white-space:nowrap;   /* номер и названия не должны разрываться посередине */
+  text-decoration:underline;
+  text-underline-offset:3px;
+  text-decoration-color:var(--sand);
+  transition:text-decoration-color .2s var(--ease);
+}
+.author a:hover{text-decoration-color:var(--olive)}
+/* ссылки складываются сеткой: при переносе не остаётся висячих разделителей */
+.author-links{
+  display:flex;flex-wrap:wrap;justify-content:center;
+  gap:4px 18px;
+  margin-top:8px;
+  font-size:.85rem;
+}
+.author-links a{
+  color:var(--olive);
+  white-space:nowrap;
+  padding:4px 0;
+  text-decoration:underline;
+  text-underline-offset:3px;
+  text-decoration-color:var(--sand);
+  transition:text-decoration-color .2s var(--ease);
+}
+.author-links a:hover{text-decoration-color:var(--olive)}
+
+.spacer{flex:1;min-height:24px}
+.center{text-align:center}
+.mt-s{margin-top:10px}
+.mt-m{margin-top:18px}
+.mt-l{margin-top:30px}
+@media (min-height:760px){
+  .screen{padding-top:44px}
+}
+/* самые узкие телефоны: «Интегрировать» в исходном кегле не помещается в карточку.
+   Блок должен стоять после объявления .mode-name — media-запрос не добавляет
+   специфичности, и при равной специфичности выигрывает правило ниже по файлу. */
+@media (max-width:359px){
+  .mode-name{font-size:1.85rem}
+  .mode-name--transition{font-size:1.5rem}
+  .phase-day{font-size:2.5rem}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ЭКРАН 1 — приветствие -->
+<section class="screen" id="s-welcome" aria-labelledby="welcome-title">
+  <div class="spacer"></div>
+  <p class="eyebrow">Ежедневная практика</p>
+  <h1 id="welcome-title" class="mt-s">Мой ритм<br>сегодня</h1>
+  <p class="lede mt-m" id="welcome-lede">2 минуты, чтобы понять, какого режима сегодня просит твоё тело.</p>
+  <div class="spacer"></div>
+  <button class="btn" id="welcome-primary">Начать</button>
+  <button class="btn btn-ghost mt-s" id="welcome-secondary" hidden></button>
+  <button class="btn-text center mt-s" data-go="history" id="welcome-history" hidden>Мой ритм</button>
+  <p class="muted center mt-l">Мы не спрашиваем имя, почту и телефон.<br>Всё остаётся на твоём устройстве.</p>
+  <p class="muted center author">Идея и воплощение — Анна,<br>автор канала <a href="https://t.me/anna_vkuszhizni" target="_blank" rel="noopener noreferrer">«Вкус жизни»</a></p>
+</section>
+
+<!-- ЭКРАН 2 — данные цикла -->
+<section class="screen" id="s-cycle" aria-labelledby="cycle-title">
+  <div class="topbar">
+    <button class="back" data-back="welcome" aria-label="Назад">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M12.5 4L6.5 10l6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+  <h2 id="cycle-title">Несколько слов о цикле</h2>
+  <p class="lede mt-s">Это нужно только для ориентира — предположить, где ты сейчас находишься.</p>
+
+  <form id="cycle-form" class="mt-l" novalidate>
+    <div class="field">
+      <span class="label" id="f-start-label">Первый день последней менструации</span>
+      <div class="date-row" role="group" aria-labelledby="f-start-label">
+        <select id="f-day" aria-label="День"></select>
+        <select id="f-month" aria-label="Месяц"></select>
+        <select id="f-year" aria-label="Год"></select>
+      </div>
+    </div>
+    <div class="field">
+      <label for="f-length">Обычная длина цикла</label>
+      <select id="f-length"></select>
+    </div>
+    <div class="field">
+      <label for="f-period">Обычная продолжительность менструации</label>
+      <select id="f-period"></select>
+    </div>
+    <div class="field">
+      <span class="label" id="f-regular-label">Цикл регулярный?</span>
+      <div class="chips" role="radiogroup" aria-labelledby="f-regular-label" id="f-regular">
+        <button type="button" class="chip" data-val="yes" role="radio" aria-checked="false">Да</button>
+        <button type="button" class="chip" data-val="no" role="radio" aria-checked="false">Скорее нет</button>
+        <button type="button" class="chip" data-val="unknown" role="radio" aria-checked="false">Не знаю</button>
+      </div>
+    </div>
+    <p class="note" id="cycle-note" hidden role="status"></p>
+    <button class="btn mt-m" type="submit">Дальше</button>
+  </form>
+  <p class="muted center mt-l">Приложение не определяет фактическую овуляцию и не ставит диагнозов.</p>
+</section>
+
+<!-- ЭКРАНЫ 3–7 — вопросы -->
+<section class="screen" id="s-question" aria-labelledby="q-title">
+  <div class="topbar">
+    <button class="back" id="q-back" aria-label="Назад">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M12.5 4L6.5 10l6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="dots" id="q-dots" aria-hidden="true"></div>
+  </div>
+  <p class="eyebrow" id="q-counter"></p>
+  <h2 id="q-title" class="mt-s"></h2>
+  <div class="options" id="q-options" role="group" aria-labelledby="q-title"></div>
+  <div class="spacer"></div>
+  <p class="muted center">Выбирай то, что ближе прямо сейчас, а не то, как должно быть.</p>
+</section>
+
+<!-- ЭКРАН РЕЗУЛЬТАТА -->
+<section class="screen" id="s-result" aria-labelledby="result-mode">
+  <p class="eyebrow center" id="result-date"></p>
+
+  <div class="card phase-card mt-m">
+    <p class="muted" style="letter-spacing:.1em;text-transform:uppercase;font-size:.7rem">Предположительно</p>
+    <p class="phase-day" id="result-day"></p>
+    <p class="phase-name" id="result-phase"></p>
+    <p class="muted mt-s" id="result-phase-note"></p>
+  </div>
+
+  <div class="card mode-card">
+    <p class="eyebrow">Режим твоего тела сегодня</p>
+    <p class="mode-name mt-s" id="result-mode"></p>
+    <p class="lede mt-s" id="result-mode-note"></p>
+  </div>
+
+  <div class="align" id="result-align" role="status"></div>
+
+  <div class="card recs" id="result-recs"></div>
+
+  <div class="card coach">
+    <p class="eyebrow">Вопрос дня</p>
+    <q class="mt-s" id="result-coach"></q>
+  </div>
+
+  <div class="stack">
+    <button class="btn" data-go="done">Попробую сегодня</button>
+    <button class="btn-ghost btn" data-go="evening">Отметиться вечером</button>
+  </div>
+  <p class="muted disclaimer">Это не медицинское приложение. Если что-то беспокоит в теле — стоит обратиться к врачу.</p>
+</section>
+
+<!-- ВЕЧЕРНИЙ CHECK-IN -->
+<section class="screen" id="s-evening" aria-labelledby="evening-title">
+  <div class="topbar">
+    <button class="back" id="evening-back" aria-label="Назад">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M12.5 4L6.5 10l6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+  <p class="eyebrow">Вечер</p>
+  <h2 id="evening-title" class="mt-s">Как прошёл день</h2>
+  <p class="lede mt-s">Три коротких ответа. Можно в одно слово, можно пропустить.</p>
+  <form id="evening-form" class="mt-l" novalidate>
+    <div class="field">
+      <label for="e-resource">Что сегодня действительно дало тебе ресурс?</label>
+      <textarea id="e-resource" rows="3"></textarea>
+    </div>
+    <div class="field">
+      <label for="e-excess">Что оказалось лишним или слишком большим?</label>
+      <textarea id="e-excess" rows="3"></textarea>
+    </div>
+    <div class="field">
+      <label for="e-body">Что сейчас просит тело?</label>
+      <textarea id="e-body" rows="3"></textarea>
+    </div>
+    <button class="btn mt-m" type="submit">Сохранить</button>
+  </form>
+</section>
+
+<!-- ЗАВЕРШЕНИЕ -->
+<section class="screen" id="s-done" aria-labelledby="done-title">
+  <div class="spacer"></div>
+  <div class="center">
+    <svg width="52" height="52" viewBox="0 0 52 52" fill="none" aria-hidden="true" style="margin:0 auto">
+      <circle cx="26" cy="26" r="25" stroke="#93A183" stroke-width="1"/>
+      <path d="M17 26.5l6.5 6.5L35 20" stroke="#6E7A5C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <h2 class="mt-m" id="done-title">Сегодняшнее наблюдение сохранено</h2>
+    <p class="lede mt-s">Мы постепенно собираем твой собственный ритм.</p>
+  </div>
+  <div class="spacer"></div>
+  <div class="stack">
+    <button class="btn" id="done-primary" data-go="evening">Отметиться вечером</button>
+    <button class="btn-text" data-go="history">Мой ритм</button>
+  </div>
+  <p class="muted center author">
+    Эту практику придумала Анна — она пишет о женском ритме, теле и вкусе жизни.
+  </p>
+  <p class="author-links">
+    <a href="https://t.me/anna_vkuszhizni" target="_blank" rel="noopener noreferrer">Канал «Вкус жизни»</a>
+    <a href="https://t.me/Anna_lifevibe" target="_blank" rel="noopener noreferrer">@Anna_lifevibe</a>
+    <a href="https://wa.me/79533941465" target="_blank" rel="noopener noreferrer">написать в WhatsApp</a>
+  </p>
+</section>
+
+<!-- ИСТОРИЯ -->
+<section class="screen" id="s-history" aria-labelledby="history-title">
+  <div class="topbar">
+    <button class="back" id="history-back" aria-label="Назад">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M12.5 4L6.5 10l6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+  <h2 id="history-title">Мой ритм</h2>
+  <p class="lede mt-s">Наблюдения, которые уже собрались.</p>
+  <div class="mt-l" id="history-list"></div>
+  <div class="spacer"></div>
+  <button class="btn-text center mt-m" id="history-reset">Изменить данные цикла</button>
+</section>
+
+</div>
+
+<!-- Для Supabase: раскомментируй строку ниже и заполни CONFIG в скрипте (см. SUPABASE.md).
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+-->
+
+<script>
+(function () {
+"use strict";
+
+/* ==========================================================================
+   КОНФИГУРАЦИЯ
+   Чтобы перевести приложение на Supabase: заполни URL и ключ, поставь
+   BACKEND в "supabase" и подключи supabase-js (см. конец файла и SUPABASE.md).
+   ========================================================================== */
+var CONFIG = {
+  BACKEND: "local",          // "local" | "supabase"
+  SUPABASE_URL: "",
+  SUPABASE_ANON_KEY: "",
+  EVENING_HOUR: 18           // с этого часа при возврате предлагаем вечерний check-in
+};
+
+/* ==========================================================================
+   РЕЖИМЫ ДНЯ
+   ========================================================================== */
+var MODES = {
+  create:    { title: "Создавать",     note: "Новое, идеи, любопытство, начинания." },
+  express:   { title: "Проявлять",     note: "Люди, разговоры, действие, видимость." },
+  gather:    { title: "Собирать",      note: "Анализ, порядок, завершение, доводка." },
+  integrate: { title: "Интегрировать", note: "Тишина, отдых, размышление, меньше нагрузки." }
+};
+
+// круг режимов: соседние — родственные, через один — противоположные
+var MODE_CIRCLE = ["create", "express", "gather", "integrate"];
+
+/* ==========================================================================
+   ПЯТЬ ВОПРОСОВ
+   w — вес вопроса: прямые телесные сигналы (пробуждение и желания тела) весят больше.
+   scores — скрытые веса вариантов, пользовательнице они никогда не показываются.
+   ========================================================================== */
+var QUESTIONS = [
+  {
+    id: "q1",
+    w: 1.5,
+    title: "Как ты сегодня проснулась?",
+    options: [
+      { id: "a", text: "Легко и с интересом — хочется что-то начать", scores: { create: 1, express: 0.5 } },
+      { id: "b", text: "Бодро, с энергией, будто уже в движении",     scores: { express: 1, create: 0.5 } },
+      { id: "c", text: "Спокойно и собранно, голова ясная",           scores: { gather: 1, create: 0.5 } },
+      { id: "d", text: "Медленно и тяжело, хочется ещё полежать",     scores: { integrate: 1, gather: 0.5 } }
+    ]
+  },
+  {
+    id: "q2",
+    w: 1,
+    title: "К чему сегодня само тянет?",
+    options: [
+      { id: "a", text: "Придумывать, пробовать, начинать новое",      scores: { create: 1, express: 0.5 } },
+      { id: "b", text: "Говорить, показывать, договариваться",        scores: { express: 1, create: 0.5 } },
+      { id: "c", text: "Доводить до конца и наводить порядок",        scores: { gather: 1, integrate: 0.5 } },
+      { id: "d", text: "Ничего не начинать, побыть в тишине",         scores: { integrate: 1, gather: 0.5 } }
+    ]
+  },
+  {
+    id: "q3",
+    w: 1,
+    title: "Как сегодня хочется взаимодействовать с людьми?",
+    options: [
+      { id: "a", text: "Хочется людей, разговоров, внимания",         scores: { express: 1, create: 0.5 } },
+      { id: "b", text: "Хочется новых лиц и свежих идей",             scores: { create: 1, express: 0.5 } },
+      { id: "c", text: "Общаться можно, но коротко и по делу",        scores: { gather: 1, express: 0.5 } },
+      { id: "d", text: "Только с близкими — или совсем одной",        scores: { integrate: 1, gather: 0.5 } }
+    ]
+  },
+  {
+    id: "q4",
+    w: 1.5,
+    title: "Чего сейчас хочется телу?",
+    options: [
+      { id: "a", text: "Двигаться активно — быстрый шаг, танец",      scores: { express: 1, create: 0.5 } },
+      { id: "b", text: "Лёгкого движения — прогулка, растяжка",       scores: { create: 1, integrate: 0.5 } },
+      { id: "c", text: "Ровной нагрузки без рекордов",                scores: { gather: 1, integrate: 0.5 } },
+      { id: "d", text: "Покоя, тепла, лежать",                        scores: { integrate: 1, gather: 0.5 } }
+    ]
+  },
+  {
+    id: "q5",
+    w: 1,
+    title: "Что происходит с аппетитом и едой?",
+    options: [
+      { id: "a", text: "Аппетит небольшой, хватает лёгкого",          scores: { create: 1, express: 0.5 } },
+      { id: "b", text: "Есть аппетит, ем с удовольствием",            scores: { express: 1, gather: 0.5 } },
+      { id: "c", text: "Ем как обычно, без особых желаний",           scores: { gather: 1, create: 0.5 } },
+      { id: "d", text: "Тянет на плотное, сладкое или солёное",       scores: { integrate: 1, gather: 0.5 } }
+    ]
+  }
+];
+
+/* ==========================================================================
+   ФАЗЫ ЦИКЛА — только предположение, не диагностика
+   ========================================================================== */
+var PHASES = {
+  menstrual: {
+    title: "менструальная фаза",
+    note: "Тело занято обновлением. Сил обычно меньше, и это нормально.",
+    typical: "integrate"
+  },
+  follicular: {
+    title: "фолликулярная фаза",
+    note: "Обычно в это время возвращается энергия и интерес к новому.",
+    typical: "create"
+  },
+  ovulatory: {
+    title: "овуляторное окно",
+    note: "Дни, на которые чаще всего приходится овуляция. Приложение не определяет её фактически.",
+    typical: "express"
+  },
+  luteal: {
+    title: "лютеиновая фаза",
+    note: "Обычно тело переходит к собиранию и завершению, чувствительность растёт.",
+    typical: "gather"
+  },
+  luteal_late: {
+    title: "лютеиновая фаза, ближе к концу цикла",
+    note: "Последние дни перед менструацией. Обычно хочется меньше нагрузки и больше тишины.",
+    typical: "integrate"
+  }
+};
+
+/* ==========================================================================
+   РЕКОМЕНДАЦИИ
+   ========================================================================== */
+var REC_ORDER = ["work", "social", "move", "food", "rest"];
+var REC_LABELS = {
+  work: "Работа",
+  social: "Общение",
+  move: "Движение",
+  food: "Питание",
+  rest: "Восстановление"
+};
+
+var RECS = {
+  create: {
+    work: "Хорошее время начинать и набрасывать. Возьми одну новую задачу, а не десять.",
+    social: "Разговоры, в которых рождаются идеи. Обсуждай замыслы, но не раздавай сроки.",
+    move: "Лёгкое и живое: прогулка, растяжка, танец под музыку. Без рекордов.",
+    food: "Свежее и лёгкое — овощи, зелень, белок. И вода: в увлечении её легко забыть.",
+    rest: "Сегодня восстанавливает смена обстановки, а не лежание. Выйди на воздух хотя бы на двадцать минут."
+  },
+  express: {
+    work: "День для видимых дел: переговоры, презентация, звонок, который откладывала.",
+    social: "Тебя хорошо слышно. Скажи то, что давно собиралась сказать.",
+    move: "Тело готово к нагрузке: быстрый шаг, тренировка, танец.",
+    food: "Полноценные приёмы пищи с белком — энергия расходуется быстро. Не пропускай еду ради дел.",
+    rest: "Заверши день раньше, чем закончатся силы. Тишина вечером — не потеря, а условие."
+  },
+  gather: {
+    work: "Хорошо идёт то, что требует внимания к деталям: доделать, проверить, разложить по местам.",
+    social: "По делу и с близкими. Большие компании сегодня скорее опустошают.",
+    move: "Ровное и предсказуемое: спокойный зал, плавание, долгая прогулка.",
+    food: "Тёплая сытная еда по расписанию. Резкие ограничения сегодня выйдут боком.",
+    rest: "Помогает порядок вокруг: разобранный стол, чистая кухня. Внешняя ясность даёт внутреннюю."
+  },
+  integrate: {
+    work: "Минимум обязательств. Одно важное дело вместо списка, решения лучше отложить.",
+    social: "Разреши себе не быть на связи. Короткий ответ — тоже ответ.",
+    move: "Мягкое: медленная прогулка, растяжка, дыхание. Или ничего.",
+    food: "Тёплое и простое, небольшими порциями. Телу нужна поддержка, а не дисциплина.",
+    rest: "Сон и тепло сегодня — работа, а не слабость. Ложись раньше обычного."
+  }
+};
+
+// добавка, когда режим переходный: голос второго режима
+var REC_BRIDGE = {
+  create: "И оставь место любопытству — хотя бы один свободный замысел.",
+  express: "И оставь место людям — один живой разговор.",
+  gather: "И оставь место порядку — доведи до конца одно дело.",
+  integrate: "И оставь место тишине — хотя бы полчаса без задач."
+};
+
+var COACH = {
+  create: [
+    "Что тебе давно хотелось попробовать, но было не время?",
+    "Какая идея сегодня просит первого маленького шага?",
+    "Где сегодня можно сделать неидеально, зато начать?",
+    "Что нового ты можешь впустить в этот день?"
+  ],
+  express: [
+    "Что ты давно хочешь сказать вслух — и кому?",
+    "Где сегодня ты можешь занять чуть больше места, чем обычно?",
+    "Что случится, если ты не будешь себя приглушать?",
+    "Кому сегодня стоит написать первой?"
+  ],
+  gather: [
+    "Что уже почти готово и просит завершения?",
+    "Что стоит убрать из списка, а не доделать?",
+    "Где ты сейчас держишь больше, чем нужно?",
+    "Что станет легче, если довести это до конца сегодня?"
+  ],
+  integrate: [
+    "От чего сегодня можно отказаться без последствий?",
+    "Что ты делаешь по привычке, хотя оно давно не нужно?",
+    "Как звучит твоя усталость, если её не заглушать?",
+    "Что было бы, если сегодня ты никому ничего не должна?"
+  ]
+};
+
+var ALIGN_TEXT = {
+  aligned: {
+    title: "Состояние совпадает с фазой.",
+    body: "Тело идёт в том же направлении, что и типичное для этих дней. Хороший день, чтобы опереться на эту волну."
+  },
+  partial: {
+    title: "Состояние отчасти совпадает с фазой.",
+    body: "Направление близкое, но своё. Ориентируйся на то, что чувствуешь, а фазу держи как фон."
+  },
+  divergent: {
+    title: "Состояние расходится с фазой.",
+    body: "Календарь предполагает одно, тело просит другого. Идём за телом — всё, что ниже, собрано по твоему состоянию."
+  }
+};
+
+/* ==========================================================================
+   ДАТЫ
+   Всё считаем в локальном времени и нормализуем к полудню,
+   чтобы переход на летнее время не сдвигал день цикла.
+   ========================================================================== */
+function atNoon(y, m, d) { return new Date(y, m, d, 12, 0, 0, 0); }
+
+function toISO(date) {
+  var m = String(date.getMonth() + 1).padStart(2, "0");
+  var d = String(date.getDate()).padStart(2, "0");
+  return date.getFullYear() + "-" + m + "-" + d;
+}
+
+function parseISO(iso) {
+  var p = String(iso).split("-");
+  return atNoon(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+}
+
+function todayISO() {
+  var n = new Date();
+  return toISO(n);
+}
+
+function daysBetween(fromDate, toDate) {
+  return Math.round((toDate - fromDate) / 86400000);
+}
+
+function humanDate(iso) {
+  var d = parseISO(iso);
+  try {
+    return d.toLocaleDateString("ru-RU", { day: "numeric", month: "long" });
+  } catch (e) {
+    return iso;
+  }
+}
+
+function plural(n, one, few, many) {
+  var mod10 = n % 10, mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few;
+  return many;
+}
+
+/* ==========================================================================
+   АЛГОРИТМ: ДЕНЬ И ФАЗА ЦИКЛА
+   ========================================================================== */
+function computeCycle(profile, dateISO) {
+  var L = profile.cycle_length;
+  var M = profile.period_length;
+  var diff = daysBetween(parseISO(profile.last_period_start), parseISO(dateISO));
+  var day = (((diff % L) + L) % L) + 1;
+
+  // окно вокруг предполагаемой овуляции: примерно за 14 дней до следующей менструации
+  var ovuStart = L - 15;
+  var ovuEnd = L - 11;
+
+  // при нерегулярном цикле окно шире — это заведомо более грубый ориентир
+  if (profile.is_regular !== true) {
+    ovuStart -= 1;
+    ovuEnd += 1;
+  }
+
+  // окно не может залезать на менструацию или на последний день цикла
+  ovuStart = Math.max(M + 1, ovuStart);
+  ovuEnd = Math.min(L - 1, ovuEnd);
+
+  // при очень коротком цикле с длинной менструацией окна не остаётся:
+  // предполагаемая овуляция приходится на дни менструации, и честнее его не показывать
+  var hasWindow = ovuStart <= ovuEnd;
+
+  var phase;
+  if (day <= M) phase = "menstrual";
+  else if (hasWindow && day < ovuStart) phase = "follicular";
+  else if (hasWindow && day <= ovuEnd) phase = "ovulatory";
+  else phase = (L - day) < 3 ? "luteal_late" : "luteal";
+
+  return {
+    day: day,
+    phase: phase,
+    ovuStart: hasWindow ? ovuStart : null,
+    ovuEnd: hasWindow ? ovuEnd : null,
+    length: L,
+    period: M
+  };
+}
+
+/* ==========================================================================
+   АЛГОРИТМ: ОТВЕТЫ → РЕЖИМ
+   ========================================================================== */
+// Разрыв между первым и вторым режимом меньше этого — состояния практически равны,
+// показываем переходный режим. При 0.5 переходным оказывается примерно каждый
+// четвёртый расклад ответов — редко достаточно, чтобы оставаться исключением.
+var TRANSITION_GAP = 0.5;
+
+function computeMode(answers) {
+  var totals = { create: 0, express: 0, gather: 0, integrate: 0 };
+  var bodyVote = { create: 0, express: 0, gather: 0, integrate: 0 };
+
+  QUESTIONS.forEach(function (q) {
+    var chosen = null;
+    q.options.forEach(function (o) { if (o.id === answers[q.id]) chosen = o; });
+    if (!chosen) return;
+    Object.keys(chosen.scores).forEach(function (key) {
+      totals[key] += chosen.scores[key] * q.w;
+      if (q.id === "q4") bodyVote[key] += chosen.scores[key];
+    });
+  });
+
+  var ranked = MODE_CIRCLE.slice().sort(function (a, b) {
+    if (totals[b] !== totals[a]) return totals[b] - totals[a];
+    // при полном равенстве решает ответ про тело
+    if (bodyVote[b] !== bodyVote[a]) return bodyVote[b] - bodyVote[a];
+    return MODE_CIRCLE.indexOf(a) - MODE_CIRCLE.indexOf(b);
+  });
+
+  var primary = ranked[0];
+  var runnerUp = ranked[1];
+  var gap = totals[primary] - totals[runnerUp];
+  var isTransition = gap < TRANSITION_GAP;
+
+  return {
+    mode: primary,
+    mode_secondary: isTransition ? runnerUp : null,
+    is_transition: isTransition
+  };
+}
+
+/* ==========================================================================
+   АЛГОРИТМ: СОВПАДЕНИЕ ФАЗЫ И СОСТОЯНИЯ
+   ========================================================================== */
+function circleDistance(a, b) {
+  var d = Math.abs(MODE_CIRCLE.indexOf(a) - MODE_CIRCLE.indexOf(b));
+  return Math.min(d, MODE_CIRCLE.length - d);
+}
+
+function computeAlignment(modeResult, phaseKey) {
+  var typical = PHASES[phaseKey].typical;
+  if (modeResult.mode === typical) return "aligned";
+  if (modeResult.mode_secondary === typical) return "partial";
+  var dist = circleDistance(modeResult.mode, typical);
+  return dist === 1 ? "partial" : "divergent";
+}
+
+function modeTitle(modeResult) {
+  var base = MODES[modeResult.mode].title;
+  if (modeResult.is_transition && modeResult.mode_secondary) {
+    return base + " → " + MODES[modeResult.mode_secondary].title;
+  }
+  return base;
+}
+
+function buildResult(profile, answers, dateISO) {
+  var cycle = computeCycle(profile, dateISO);
+  var modeResult = computeMode(answers);
+  var alignment = computeAlignment(modeResult, cycle.phase);
+  var coachList = COACH[modeResult.mode];
+
+  return {
+    entry_date: dateISO,
+    cycle_day: cycle.day,
+    phase: cycle.phase,
+    answers: answers,
+    mode: modeResult.mode,
+    mode_secondary: modeResult.mode_secondary,
+    is_transition: modeResult.is_transition,
+    alignment: alignment,
+    coach: coachList[cycle.day % coachList.length]
+  };
+}
+
+/* ==========================================================================
+   ХРАНИЛИЩЕ
+   Единый интерфейс: getProfile, saveProfile, saveDailyEntry, getEntry,
+   saveEveningCheckin, logVisit, getHistory.
+   Поля совпадают с колонками таблиц Supabase (см. SUPABASE.md), поэтому
+   переезд в облако не требует правок в остальном коде.
+   ========================================================================== */
+var STORAGE_KEYS = {
+  anon: "ritm.anon_id",
+  profile: "ritm.profile",
+  entries: "ritm.entries",
+  visits: "ritm.visits"
+};
+
+function uuid() {
+  if (window.crypto && typeof window.crypto.randomUUID === "function") {
+    return window.crypto.randomUUID();
+  }
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0;
+    var v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+function readJSON(key, fallback) {
+  try {
+    var raw = window.localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (e) {
+    return fallback;
+  }
+}
+
+function writeJSON(key, value) {
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch (e) {
+    console.warn("Не удалось сохранить данные локально:", e);
+    return false;
+  }
+}
+
+function getAnonId() {
+  var id;
+  try {
+    id = window.localStorage.getItem(STORAGE_KEYS.anon);
+    if (!id) {
+      id = uuid();
+      window.localStorage.setItem(STORAGE_KEYS.anon, id);
+    }
+  } catch (e) {
+    id = id || uuid();
+  }
+  return id;
+}
+
+var LocalStore = {
+  getProfile: function () {
+    return Promise.resolve(readJSON(STORAGE_KEYS.profile, null));
+  },
+  saveProfile: function (data) {
+    var now = new Date().toISOString();
+    var existing = readJSON(STORAGE_KEYS.profile, null);
+    var profile = {
+      anon_id: getAnonId(),
+      cycle_length: data.cycle_length,
+      period_length: data.period_length,
+      is_regular: data.is_regular,
+      last_period_start: data.last_period_start,
+      created_at: existing ? existing.created_at : now,
+      updated_at: now,
+      // первый визит уже случился до создания профиля — учитываем его сразу
+      visit_count: existing ? existing.visit_count : 1,
+      last_visit_date: existing ? existing.last_visit_date : todayISO()
+    };
+    writeJSON(STORAGE_KEYS.profile, profile);
+    return Promise.resolve(profile);
+  },
+  saveDailyEntry: function (entry) {
+    var entries = readJSON(STORAGE_KEYS.entries, []);
+    var record = {
+      anon_id: getAnonId(),
+      entry_date: entry.entry_date,
+      cycle_day: entry.cycle_day,
+      phase: entry.phase,
+      answers: entry.answers,
+      mode: entry.mode,
+      mode_secondary: entry.mode_secondary,
+      is_transition: entry.is_transition,
+      alignment: entry.alignment,
+      created_at: new Date().toISOString(),
+      evening_resource: null,
+      evening_excess: null,
+      evening_body: null,
+      evening_at: null
+    };
+    var idx = -1;
+    entries.forEach(function (e, i) { if (e.entry_date === record.entry_date) idx = i; });
+    if (idx >= 0) {
+      // день переигран заново — вечерние ответы, если были, сохраняем
+      record.evening_resource = entries[idx].evening_resource;
+      record.evening_excess = entries[idx].evening_excess;
+      record.evening_body = entries[idx].evening_body;
+      record.evening_at = entries[idx].evening_at;
+      entries[idx] = record;
+    } else {
+      entries.push(record);
+    }
+    writeJSON(STORAGE_KEYS.entries, entries);
+    return Promise.resolve(record);
+  },
+  getEntry: function (dateISO) {
+    var entries = readJSON(STORAGE_KEYS.entries, []);
+    var found = null;
+    entries.forEach(function (e) { if (e.entry_date === dateISO) found = e; });
+    return Promise.resolve(found);
+  },
+  saveEveningCheckin: function (dateISO, data) {
+    var entries = readJSON(STORAGE_KEYS.entries, []);
+    var idx = -1;
+    entries.forEach(function (e, i) { if (e.entry_date === dateISO) idx = i; });
+    if (idx < 0) {
+      // вечерний check-in без утреннего прохода — сохраняем отдельной записью
+      entries.push({
+        anon_id: getAnonId(),
+        entry_date: dateISO,
+        cycle_day: null, phase: null, answers: null,
+        mode: null, mode_secondary: null, is_transition: null, alignment: null,
+        created_at: new Date().toISOString(),
+        evening_resource: data.evening_resource,
+        evening_excess: data.evening_excess,
+        evening_body: data.evening_body,
+        evening_at: new Date().toISOString()
+      });
+    } else {
+      entries[idx].evening_resource = data.evening_resource;
+      entries[idx].evening_excess = data.evening_excess;
+      entries[idx].evening_body = data.evening_body;
+      entries[idx].evening_at = new Date().toISOString();
+    }
+    writeJSON(STORAGE_KEYS.entries, entries);
+    return Promise.resolve(true);
+  },
+  logVisit: function (visit) {
+    var visits = readJSON(STORAGE_KEYS.visits, []);
+    visits.push({
+      anon_id: getAnonId(),
+      visited_at: new Date().toISOString(),
+      visit_type: visit.visit_type,
+      is_return_visit: visit.is_return_visit
+    });
+    if (visits.length > 400) visits = visits.slice(-400);
+    writeJSON(STORAGE_KEYS.visits, visits);
+
+    var profile = readJSON(STORAGE_KEYS.profile, null);
+    if (profile) {
+      profile.visit_count = (profile.visit_count || 0) + 1;
+      profile.last_visit_date = todayISO();
+      writeJSON(STORAGE_KEYS.profile, profile);
+    }
+    return Promise.resolve(true);
+  },
+  getHistory: function (limit) {
+    var entries = readJSON(STORAGE_KEYS.entries, []);
+    entries.sort(function (a, b) { return a.entry_date < b.entry_date ? 1 : -1; });
+    return Promise.resolve(limit ? entries.slice(0, limit) : entries);
+  }
+};
+
+/* --------------------------------------------------------------------------
+   Заготовка Supabase. Активируется, когда CONFIG.BACKEND === "supabase".
+   Требует подключённого supabase-js и включённых анонимных входов.
+   -------------------------------------------------------------------------- */
+var SupabaseStore = (function () {
+  var client = null;
+  var uid = null;
+
+  function db() {
+    if (!client) {
+      if (!window.supabase || !CONFIG.SUPABASE_URL || !CONFIG.SUPABASE_ANON_KEY) {
+        throw new Error("supabase-js не подключён или не заполнен CONFIG");
+      }
+      client = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+    }
+    return client;
+  }
+
+  function auth() {
+    if (uid) return Promise.resolve(uid);
+    return db().auth.getSession().then(function (res) {
+      if (res.data && res.data.session) return res.data.session;
+      return db().auth.signInAnonymously().then(function (r) { return r.data.session; });
+    }).then(function (session) {
+      uid = session.user.id;
+      return uid;
+    });
+  }
+
+  return {
+    getProfile: function () {
+      return auth().then(function (id) {
+        return db().from("profiles").select("*").eq("anon_id", id).maybeSingle();
+      }).then(function (res) { return res.data || null; });
+    },
+    saveProfile: function (data) {
+      return auth().then(function (id) {
+        return db().from("profiles").upsert({
+          anon_id: id,
+          cycle_length: data.cycle_length,
+          period_length: data.period_length,
+          is_regular: data.is_regular,
+          last_period_start: data.last_period_start,
+          updated_at: new Date().toISOString()
+        }, { onConflict: "anon_id" }).select().single();
+      }).then(function (res) { return res.data; });
+    },
+    saveDailyEntry: function (entry) {
+      return auth().then(function (id) {
+        return db().from("daily_entries").upsert({
+          anon_id: id,
+          entry_date: entry.entry_date,
+          cycle_day: entry.cycle_day,
+          phase: entry.phase,
+          answers: entry.answers,
+          mode: entry.mode,
+          mode_secondary: entry.mode_secondary,
+          is_transition: entry.is_transition,
+          alignment: entry.alignment
+        }, { onConflict: "anon_id,entry_date" }).select().single();
+      }).then(function (res) { return res.data; });
+    },
+    getEntry: function (dateISO) {
+      return auth().then(function (id) {
+        return db().from("daily_entries").select("*")
+          .eq("anon_id", id).eq("entry_date", dateISO).maybeSingle();
+      }).then(function (res) { return res.data || null; });
+    },
+    saveEveningCheckin: function (dateISO, data) {
+      return auth().then(function (id) {
+        return db().from("daily_entries").upsert({
+          anon_id: id,
+          entry_date: dateISO,
+          evening_resource: data.evening_resource,
+          evening_excess: data.evening_excess,
+          evening_body: data.evening_body,
+          evening_at: new Date().toISOString()
+        }, { onConflict: "anon_id,entry_date" });
+      }).then(function () { return true; });
+    },
+    logVisit: function (visit) {
+      return auth().then(function (id) {
+        return db().from("visits").insert({
+          anon_id: id,
+          visit_type: visit.visit_type,
+          is_return_visit: visit.is_return_visit
+        });
+      }).then(function () { return true; });
+    },
+    getHistory: function (limit) {
+      return auth().then(function (id) {
+        return db().from("daily_entries").select("*")
+          .eq("anon_id", id)
+          .order("entry_date", { ascending: false })
+          .limit(limit || 60);
+      }).then(function (res) { return res.data || []; });
+    }
+  };
+})();
+
+var Store = CONFIG.BACKEND === "supabase" ? SupabaseStore : LocalStore;
+
+/* ==========================================================================
+   ИНТЕРФЕЙС
+   ========================================================================== */
+var $ = function (sel) { return document.querySelector(sel); };
+var $$ = function (sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); };
+
+var state = {
+  profile: null,
+  answers: {},
+  qIndex: 0,
+  entry: null,
+  regular: null,
+  eveningBackTo: "s-welcome",
+  historyBackTo: "s-welcome"
+};
+
+function show(id) {
+  $$(".screen").forEach(function (s) { s.classList.remove("is-active"); });
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add("is-active");
+  window.scrollTo(0, 0);
+  var focusable = el.querySelector("h1, h2");
+  if (focusable) {
+    focusable.setAttribute("tabindex", "-1");
+    focusable.focus({ preventScroll: true });
+  }
+}
+
+function isEveningNow() {
+  return new Date().getHours() >= CONFIG.EVENING_HOUR;
+}
+
+/* ——— экран 1 ——— */
+function renderWelcome(todayEntry) {
+  var hasProfile = !!state.profile;
+  var lede = $("#welcome-lede");
+  var primary = $("#welcome-primary");
+  var secondary = $("#welcome-secondary");
+  var historyBtn = $("#welcome-history");
+
+  if (!hasProfile) {
+    lede.textContent = "2 минуты, чтобы понять, какого режима сегодня просит твоё тело.";
+    primary.textContent = "Начать";
+    secondary.hidden = true;
+    historyBtn.hidden = true;
+    return;
+  }
+
+  if (todayEntry && todayEntry.mode) {
+    lede.textContent = "С возвращением. Сегодняшний день уже отмечен — можно вернуться к нему или пройти заново.";
+    primary.textContent = "Открыть сегодняшний режим";
+    secondary.hidden = false;
+    secondary.textContent = "Пройти день заново";
+  } else {
+    lede.textContent = "С возвращением. Посмотрим, какого режима просит тело сегодня.";
+    primary.textContent = "Начать день";
+    secondary.hidden = true;
+  }
+  historyBtn.hidden = false;
+}
+
+/* ——— экран 2 ——— */
+function fillSelects() {
+  var lengthSel = $("#f-length");
+  for (var l = 21; l <= 40; l++) {
+    var o = document.createElement("option");
+    o.value = String(l);
+    o.textContent = l + " " + plural(l, "день", "дня", "дней");
+    if (l === 28) o.selected = true;
+    lengthSel.appendChild(o);
+  }
+  var periodSel = $("#f-period");
+  for (var p = 2; p <= 10; p++) {
+    var op = document.createElement("option");
+    op.value = String(p);
+    op.textContent = p + " " + plural(p, "день", "дня", "дней");
+    if (p === 5) op.selected = true;
+    periodSel.appendChild(op);
+  }
+  var now = new Date();
+  var monthSel = $("#f-month");
+  MONTH_NAMES.forEach(function (name, idx) {
+    var om = document.createElement("option");
+    om.value = String(idx);
+    om.textContent = name;
+    if (idx === now.getMonth()) om.selected = true;
+    monthSel.appendChild(om);
+  });
+
+  var yearSel = $("#f-year");
+  [now.getFullYear() - 1, now.getFullYear()].forEach(function (y) {
+    var oy = document.createElement("option");
+    oy.value = String(y);
+    oy.textContent = String(y);
+    if (y === now.getFullYear()) oy.selected = true;
+    yearSel.appendChild(oy);
+  });
+
+  fillDays(now.getDate());
+  monthSel.addEventListener("change", function () { fillDays(); });
+  yearSel.addEventListener("change", function () { fillDays(); });
+}
+
+var MONTH_NAMES = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+                   "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+
+// число дней зависит от месяца и года — список пересобирается при их смене
+function fillDays(preferred) {
+  var daySel = $("#f-day");
+  var keep = preferred || Number(daySel.value) || 0;
+  var month = Number($("#f-month").value);
+  var year = Number($("#f-year").value);
+  var total = new Date(year, month + 1, 0).getDate();
+
+  daySel.innerHTML = "";
+  for (var d = 1; d <= total; d++) {
+    var od = document.createElement("option");
+    od.value = String(d);
+    od.textContent = String(d);
+    daySel.appendChild(od);
+  }
+  daySel.value = String(Math.min(keep || 1, total));
+}
+
+// собирает выбранную дату; возвращает null, если такой даты не существует
+function readStartDate() {
+  var d = Number($("#f-day").value);
+  var m = Number($("#f-month").value);
+  var y = Number($("#f-year").value);
+  if (!d || isNaN(m) || !y) return null;
+  var date = new Date(y, m, d, 12, 0, 0, 0);
+  if (date.getDate() !== d || date.getMonth() !== m) return null;
+  return toISO(date);
+}
+
+function fillCycleForm() {
+  if (!state.profile) return;
+  var saved = parseISO(state.profile.last_period_start);
+  $("#f-year").value = String(saved.getFullYear());
+  $("#f-month").value = String(saved.getMonth());
+  fillDays(saved.getDate());
+  $("#f-length").value = String(state.profile.cycle_length);
+  $("#f-period").value = String(state.profile.period_length);
+  var val = state.profile.is_regular === true ? "yes"
+          : state.profile.is_regular === false ? "no" : "unknown";
+  pickRegular(val);
+}
+
+function pickRegular(val) {
+  state.regular = val;
+  $$("#f-regular .chip").forEach(function (c) {
+    var on = c.dataset.val === val;
+    c.classList.toggle("is-picked", on);
+    c.setAttribute("aria-checked", on ? "true" : "false");
+  });
+}
+
+function showNote(text) {
+  var note = $("#cycle-note");
+  if (!text) { note.hidden = true; note.textContent = ""; return; }
+  note.hidden = false;
+  note.textContent = text;
+}
+
+function submitCycle(event) {
+  event.preventDefault();
+  var startVal = readStartDate();
+  var length = Number($("#f-length").value);
+  var period = Number($("#f-period").value);
+
+  if (!startVal) { showNote("Такой даты не существует — проверь день и месяц."); return; }
+
+  var diff = daysBetween(parseISO(startVal), parseISO(todayISO()));
+  if (diff < 0) { showNote("Дата в будущем. Укажи день, который уже был."); return; }
+  if (period >= length) { showNote("Менструация не может длиться дольше самого цикла — проверь оба поля."); return; }
+  if (diff > 60 && !state.noteShown) {
+    state.noteShown = true;
+    showNote("С этой даты прошло больше двух месяцев. Если менструация была позже — поправь дату. Если нет, просто нажми «Дальше» ещё раз.");
+    return;
+  }
+  if (!state.regular) { showNote("Отметь, регулярный ли цикл — хотя бы «Не знаю»."); return; }
+
+  showNote("");
+  state.noteShown = false;
+
+  Store.saveProfile({
+    cycle_length: length,
+    period_length: period,
+    is_regular: state.regular === "yes" ? true : state.regular === "no" ? false : null,
+    last_period_start: startVal
+  }).then(function (profile) {
+    state.profile = profile;
+    startQuestions();
+  });
+}
+
+/* ——— экраны 3–7 ——— */
+function startQuestions() {
+  state.answers = {};
+  state.qIndex = 0;
+  renderQuestion();
+  show("s-question");
+}
+
+function renderQuestion() {
+  var q = QUESTIONS[state.qIndex];
+  $("#q-counter").textContent = "Вопрос " + (state.qIndex + 1) + " из " + QUESTIONS.length;
+  $("#q-title").textContent = q.title;
+
+  var dots = $("#q-dots");
+  dots.innerHTML = "";
+  QUESTIONS.forEach(function (_, i) {
+    var d = document.createElement("span");
+    d.className = "dot" + (i < state.qIndex ? " is-done" : i === state.qIndex ? " is-now" : "");
+    dots.appendChild(d);
+  });
+
+  var box = $("#q-options");
+  box.innerHTML = "";
+  q.options.forEach(function (opt) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "option" + (state.answers[q.id] === opt.id ? " is-picked" : "");
+    b.textContent = opt.text;
+    b.addEventListener("click", function () { pickAnswer(q.id, opt.id, b); });
+    box.appendChild(b);
+  });
+}
+
+function pickAnswer(questionId, optionId, button) {
+  state.answers[questionId] = optionId;
+  $$("#q-options .option").forEach(function (b) { b.classList.remove("is-picked"); });
+  button.classList.add("is-picked");
+  window.setTimeout(function () {
+    if (state.qIndex < QUESTIONS.length - 1) {
+      state.qIndex += 1;
+      renderQuestion();
+    } else {
+      finishQuestions();
+    }
+  }, 260);
+}
+
+function questionBack() {
+  if (state.qIndex > 0) {
+    state.qIndex -= 1;
+    renderQuestion();
+  } else {
+    show("s-welcome");
+  }
+}
+
+function finishQuestions() {
+  var entry = buildResult(state.profile, state.answers, todayISO());
+  Store.saveDailyEntry(entry).then(function () {
+    state.entry = entry;
+    renderResult(entry);
+    show("s-result");
+  });
+}
+
+/* ——— экран результата ——— */
+function renderResult(entry) {
+  var phase = PHASES[entry.phase];
+
+  $("#result-date").textContent = humanDate(entry.entry_date);
+  $("#result-day").textContent = entry.cycle_day + " день";
+  $("#result-phase").textContent = phase.title;
+
+  var phaseNote = phase.note;
+  if (state.profile && state.profile.is_regular !== true) {
+    phaseNote += " Цикл нерегулярный, поэтому это тем более ориентир, а не факт.";
+  }
+  $("#result-phase-note").textContent = phaseNote;
+
+  var modeEl = $("#result-mode");
+  modeEl.innerHTML = "";
+  var titleParts = modeTitle(entry).split(" → ");
+  // пробелы вокруг стрелки обязательны: без них строка не переносится и вылезает за карточку
+  modeEl.className = "mode-name mt-s" + (titleParts.length > 1 ? " mode-name--transition" : "");
+  titleParts.forEach(function (part, i) {
+    if (i > 0) {
+      var arrow = document.createElement("span");
+      arrow.className = "arrow";
+      arrow.textContent = "→";
+      modeEl.appendChild(document.createTextNode(" "));
+      modeEl.appendChild(arrow);
+      modeEl.appendChild(document.createTextNode(" "));
+    }
+    modeEl.appendChild(document.createTextNode(part));
+  });
+  $("#result-mode-note").textContent = MODES[entry.mode].note;
+
+  var align = $("#result-align");
+  align.className = "align align--" + entry.alignment;
+  align.innerHTML = "";
+  var strong = document.createElement("strong");
+  strong.textContent = ALIGN_TEXT[entry.alignment].title;
+  align.appendChild(strong);
+  align.appendChild(document.createTextNode(" " + ALIGN_TEXT[entry.alignment].body));
+
+  var recs = $("#result-recs");
+  recs.innerHTML = "";
+  REC_ORDER.forEach(function (key) {
+    var row = document.createElement("div");
+    row.className = "rec";
+    var label = document.createElement("p");
+    label.className = "rec-label";
+    label.textContent = REC_LABELS[key];
+    var text = document.createElement("p");
+    text.className = "rec-text";
+    text.textContent = RECS[entry.mode][key];
+    row.appendChild(label);
+    row.appendChild(text);
+    if (key === "work" && entry.is_transition && entry.mode_secondary) {
+      var extra = document.createElement("p");
+      extra.className = "rec-extra";
+      extra.textContent = REC_BRIDGE[entry.mode_secondary];
+      row.appendChild(extra);
+    }
+    recs.appendChild(row);
+  });
+
+  // вопрос дня не хранится в записи — при возврате к сегодняшнему результату
+  // он пересчитывается по дню цикла, чтобы остаться тем же самым
+  var coachList = COACH[entry.mode];
+  $("#result-coach").textContent = entry.coach || coachList[(entry.cycle_day || 0) % coachList.length];
+}
+
+/* ——— вечерний check-in ——— */
+function openEvening(backTo) {
+  state.eveningBackTo = backTo || "s-welcome";
+  var dateISO = todayISO();
+  Store.getEntry(dateISO).then(function (e) {
+    $("#e-resource").value = (e && e.evening_resource) || "";
+    $("#e-excess").value = (e && e.evening_excess) || "";
+    $("#e-body").value = (e && e.evening_body) || "";
+    show("s-evening");
+  });
+}
+
+function submitEvening(event) {
+  event.preventDefault();
+  Store.saveEveningCheckin(todayISO(), {
+    evening_resource: $("#e-resource").value.trim() || null,
+    evening_excess: $("#e-excess").value.trim() || null,
+    evening_body: $("#e-body").value.trim() || null
+  }).then(function () {
+    $("#done-primary").hidden = true;
+    show("s-done");
+  });
+}
+
+/* ——— история ——— */
+function renderHistory() {
+  var list = $("#history-list");
+  Store.getHistory(60).then(function (entries) {
+    list.innerHTML = "";
+    if (!entries.length) {
+      var empty = document.createElement("p");
+      empty.className = "empty";
+      empty.textContent = "Пока пусто. Первое наблюдение появится здесь сегодня.";
+      list.appendChild(empty);
+      return;
+    }
+    entries.forEach(function (e) {
+      var card = document.createElement("div");
+      card.className = "entry";
+
+      var top = document.createElement("div");
+      top.className = "entry-top";
+      var date = document.createElement("span");
+      date.className = "entry-date";
+      date.textContent = humanDate(e.entry_date);
+      var mode = document.createElement("span");
+      mode.className = "entry-mode";
+      mode.textContent = e.mode ? modeTitle(e) : "только вечер";
+      top.appendChild(date);
+      top.appendChild(mode);
+      card.appendChild(top);
+
+      if (e.cycle_day) {
+        var meta = document.createElement("p");
+        meta.className = "entry-meta";
+        meta.textContent = e.cycle_day + " день цикла"
+          + (PHASES[e.phase] ? " · " + PHASES[e.phase].title : "") + " ";
+        // бейдж только там, где день действительно прошли: без ответов сравнивать не с чем
+        if (ALIGN_TEXT[e.alignment]) {
+          var badge = document.createElement("span");
+          badge.className = "badge badge--" + e.alignment;
+          badge.textContent = e.alignment === "aligned" ? "совпало"
+                            : e.alignment === "partial" ? "отчасти" : "разошлось";
+          meta.appendChild(badge);
+        }
+        card.appendChild(meta);
+      }
+
+      if (e.evening_at) {
+        var ev = document.createElement("div");
+        ev.className = "entry-evening";
+        [["Ресурс", e.evening_resource], ["Лишнее", e.evening_excess], ["Тело просит", e.evening_body]]
+          .forEach(function (pair) {
+            if (!pair[1]) return;
+            var line = document.createElement("p");
+            var b = document.createElement("b");
+            b.textContent = pair[0] + ": ";
+            line.appendChild(b);
+            line.appendChild(document.createTextNode(pair[1]));
+            ev.appendChild(line);
+          });
+        if (ev.childNodes.length) card.appendChild(ev);
+      }
+
+      list.appendChild(card);
+    });
+  });
+}
+
+/* ——— события ——— */
+function bindEvents() {
+  $$("[data-go]").forEach(function (el) {
+    el.addEventListener("click", function () {
+      var target = el.dataset.go;
+      if (target === "evening") { openEvening(el.closest(".screen").id); return; }
+      if (target === "history") {
+        state.historyBackTo = el.closest(".screen").id;
+        renderHistory();
+        show("s-history");
+        return;
+      }
+      if (target === "done") { show("s-done"); return; }
+      show("s-" + target);
+    });
+  });
+
+  $$("[data-back]").forEach(function (el) {
+    el.addEventListener("click", function () { show("s-" + el.dataset.back); });
+  });
+
+  $("#welcome-primary").addEventListener("click", function () {
+    if (!state.profile) { show("s-cycle"); return; }
+    if (state.entry && state.entry.mode) { renderResult(state.entry); show("s-result"); return; }
+    startQuestions();
+  });
+
+  $("#welcome-secondary").addEventListener("click", startQuestions);
+
+  $("#f-regular").addEventListener("click", function (e) {
+    var chip = e.target.closest(".chip");
+    if (chip) pickRegular(chip.dataset.val);
+  });
+
+  $("#cycle-form").addEventListener("submit", submitCycle);
+  $("#evening-form").addEventListener("submit", submitEvening);
+  $("#q-back").addEventListener("click", questionBack);
+  $("#evening-back").addEventListener("click", function () { show(state.eveningBackTo); });
+  $("#history-back").addEventListener("click", function () { show(state.historyBackTo); });
+  $("#history-reset").addEventListener("click", function () {
+    fillCycleForm();
+    show("s-cycle");
+  });
+}
+
+/* ——— запуск ——— */
+function boot() {
+  fillSelects();
+  bindEvents();
+
+  Store.getProfile().then(function (profile) {
+    state.profile = profile;
+    return Store.getEntry(todayISO());
+  }).then(function (todayEntry) {
+    state.entry = todayEntry;
+
+    Store.logVisit({
+      visit_type: isEveningNow() ? "evening" : "morning",
+      is_return_visit: !!state.profile
+    });
+
+    renderWelcome(todayEntry);
+    $("#done-primary").hidden = !!(todayEntry && todayEntry.evening_at);
+
+    // вечером, если день уже отмечен утром, сразу предлагаем вечерний check-in
+    if (todayEntry && todayEntry.mode && !todayEntry.evening_at && isEveningNow()) {
+      openEvening("s-welcome");
+      return;
+    }
+    show("s-welcome");
+  }).catch(function (err) {
+    console.error("Не удалось запустить приложение:", err);
+    show("s-welcome");
+  });
+}
+
+// доступ из консоли для проверки алгоритма
+window.RITM = {
+  computeCycle: computeCycle,
+  computeMode: computeMode,
+  computeAlignment: computeAlignment,
+  buildResult: buildResult,
+  PHASES: PHASES,
+  MODES: MODES,
+  QUESTIONS: QUESTIONS,
+  Store: Store
+};
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", boot);
+} else {
+  boot();
+}
+
+})();
+</script>
+
+</body>
+</html>
