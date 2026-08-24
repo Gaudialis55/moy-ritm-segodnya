@@ -386,6 +386,10 @@ input:focus,select:focus,textarea:focus{border-color:var(--olive);outline:none;b
    Блок должен стоять после объявления .mode-name — media-запрос не добавляет
    специфичности, и при равной специфичности выигрывает правило ниже по файлу. */
 @media (max-width:359px){
+  /* на узком экране плотнее сетка — ячейки календаря крупнее под палец */
+  .calendar-weekdays,.calendar-grid{gap:3px}
+  .calendar-day{font-size:.78rem;border-radius:9px}
+  .calendar-legend{grid-template-columns:1fr}
   .mode-name{font-size:1.85rem}
   .mode-name--transition{font-size:1.5rem}
   .phase-day{font-size:2.5rem}
@@ -455,6 +459,99 @@ input:focus,select:focus,textarea:focus{border-color:var(--olive);outline:none;b
 @media (max-width:350px){
   .phases-mini{grid-template-columns:1fr}
 }
+
+/* =========================================================
+   МОЙ РИТМ ВПЕРЁД — КАЛЕНДАРЬ
+   ========================================================= */
+.forecast-intro{margin-top:12px;font-size:.94rem;line-height:1.6;color:var(--ink-soft)}
+.forecast-intro strong{color:var(--ink);font-weight:500}
+
+.forecast-note{
+  margin-top:18px;padding:16px 17px;
+  background:rgba(147,161,131,.12);border:1px solid rgba(147,161,131,.22);
+  border-radius:var(--radius-sm);
+  font-size:.84rem;line-height:1.55;color:var(--ink-soft);
+}
+.forecast-note strong{color:var(--olive-deep);font-weight:500}
+
+.calendar-month{margin-top:28px}
+.calendar-month--future-1{opacity:.9}
+.calendar-month--future-2{opacity:.8}
+.calendar-month-title{
+  font-family:var(--serif);font-size:1.45rem;color:var(--ink);
+  margin:0 0 12px;text-transform:capitalize;font-weight:500;
+}
+.calendar-weekdays,.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.calendar-weekdays{margin-bottom:6px}
+.calendar-weekday{
+  text-align:center;font-size:.68rem;color:var(--ink-faint);
+  text-transform:uppercase;letter-spacing:.04em;
+}
+.calendar-day{
+  position:relative;border:0;min-width:0;aspect-ratio:1 / 1;
+  border-radius:11px;font-family:var(--sans);font-size:.82rem;
+  color:#3A3733;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .15s var(--ease), box-shadow .15s var(--ease);
+}
+.calendar-day:hover{transform:scale(1.04)}
+.calendar-day:active{transform:scale(.97)}
+.calendar-empty{aspect-ratio:1 / 1}
+
+/* фазы — мягкая природная палитра */
+.calendar-day--menstrual{background:#E7C5BA}
+.calendar-day--follicular{background:#DDE7D3}
+.calendar-day--ovulatory{background:#F2DEAD}
+.calendar-day--luteal{background:#E6D2B9}
+.calendar-day--luteal-late{background:#D9C6BB}
+
+.calendar-day--today{box-shadow:inset 0 0 0 2px var(--olive-deep);font-weight:600}
+.calendar-day--past{opacity:.5}
+.calendar-day--selected{box-shadow:inset 0 0 0 2px var(--olive-deep), 0 5px 14px rgba(58,55,51,.12)}
+
+.calendar-legend{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:24px}
+.legend-item{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--ink-soft)}
+.legend-dot{width:13px;height:13px;flex:0 0 13px;border-radius:50%}
+.legend-dot--menstrual{background:#E7C5BA}
+.legend-dot--follicular{background:#DDE7D3}
+.legend-dot--ovulatory{background:#F2DEAD}
+.legend-dot--luteal{background:#E6D2B9}
+.legend-dot--luteal-late{background:#D9C6BB}
+
+.forecast-day-card{
+  margin-top:24px;padding:22px;
+  background:var(--card);border:1px solid var(--sand-soft);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+}
+.forecast-day-date{
+  font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--sage-deep);font-weight:600;
+}
+.forecast-day-mode{
+  margin-top:7px;font-family:var(--serif);
+  font-size:1.8rem;line-height:1.15;color:var(--olive-deep);
+}
+.forecast-day-phase{margin-top:4px;font-size:.86rem;color:var(--ink-soft)}
+.forecast-day-copy{margin-top:14px;font-size:.92rem;line-height:1.58;color:var(--ink)}
+.forecast-day-focus{
+  margin-top:14px;padding-top:14px;border-top:1px solid var(--sand-soft);
+  font-size:.88rem;line-height:1.55;color:var(--ink-soft);
+}
+.forecast-day-focus strong{color:var(--ink);font-weight:500}
+
+.forecast-phases{margin-top:28px;display:flex;flex-direction:column;gap:10px}
+.forecast-phase-info{
+  padding:15px 16px;border:1px solid var(--sand-soft);
+  border-radius:var(--radius-sm);background:var(--card);
+}
+.forecast-phase-info strong{
+  display:block;font-family:var(--serif);font-size:1.08rem;
+  color:var(--ink);font-weight:500;
+}
+.forecast-phase-info span{
+  display:block;margin-top:3px;font-size:.82rem;
+  color:var(--ink-soft);line-height:1.45;
+}
 </style>
 </head>
 <body>
@@ -483,6 +580,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--olive);outline:none;b
   <button class="btn mt-l" id="welcome-primary">Узнать свой ритм</button>
   <button class="btn btn-ghost mt-s" id="welcome-secondary" hidden></button>
   <button class="btn-text center mt-s" data-go="history" id="welcome-history" hidden>Мой ритм</button>
+  <button class="btn-text center" data-go="forecast" id="welcome-forecast" hidden>Мой ритм вперёд</button>
 
   <!-- ПОДРОБНЕЕ О ПРОЕКТЕ -->
   <details class="about-project">
@@ -795,9 +893,81 @@ input:focus,select:focus,textarea:focus{border-color:var(--olive);outline:none;b
   <h2 id="history-title">Мой ритм</h2>
   <p class="lede mt-s">Наблюдения, которые уже собрались.</p>
   <div class="mt-l" id="history-list"></div>
+
+  <button class="btn mt-l" data-go="forecast">Посмотреть мой ритм вперёд</button>
+
   <div class="spacer"></div>
   <button class="btn-text center mt-m" id="history-reset">Изменить данные цикла</button>
   <button class="btn-text center" data-go="privacy">Что происходит с моими данными</button>
+</section>
+
+<!-- МОЙ РИТМ ВПЕРЁД -->
+<section class="screen" id="s-forecast" aria-labelledby="forecast-title">
+  <div class="topbar">
+    <button class="back" id="forecast-back" aria-label="Назад">
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M12.5 4L6.5 10l6 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+  <p class="eyebrow">Ориентир для планирования</p>
+  <h2 id="forecast-title" class="mt-s">Мой ритм вперёд</h2>
+
+  <p class="forecast-intro">
+    Посмотри, как <strong>предположительно</strong> будут сменяться фазы твоего цикла
+    в ближайшие три месяца.
+  </p>
+
+  <div class="forecast-note">
+    <strong>Календарь предлагает гипотезу. Тело даёт окончательный ответ.</strong>
+    <br><br>
+    Реальный цикл может сместиться. После начала новой менструации обнови дату —
+    и прогноз пересчитается сам.
+  </div>
+
+  <div class="calendar-legend">
+    <div class="legend-item"><span class="legend-dot legend-dot--follicular"></span>Создавать</div>
+    <div class="legend-item"><span class="legend-dot legend-dot--ovulatory"></span>Проявлять</div>
+    <div class="legend-item"><span class="legend-dot legend-dot--luteal"></span>Собирать</div>
+    <div class="legend-item"><span class="legend-dot legend-dot--menstrual"></span>Интегрировать</div>
+    <div class="legend-item"><span class="legend-dot legend-dot--luteal-late"></span>Интегрировать — перед менструацией</div>
+  </div>
+
+  <div id="forecast-calendars"></div>
+
+  <div class="forecast-day-card" id="forecast-day-card" hidden>
+    <p class="forecast-day-date" id="forecast-day-date"></p>
+    <p class="forecast-day-mode" id="forecast-day-mode"></p>
+    <p class="forecast-day-phase" id="forecast-day-phase"></p>
+    <p class="forecast-day-copy" id="forecast-day-copy"></p>
+    <p class="forecast-day-focus" id="forecast-day-focus"></p>
+  </div>
+
+  <div class="forecast-phases">
+    <div class="forecast-phase-info">
+      <strong>🌱 Создавать</strong>
+      <span>Идеи · обучение · планирование · начало нового.</span>
+    </div>
+    <div class="forecast-phase-info">
+      <strong>🌺 Проявлять</strong>
+      <span>Встречи · переговоры · выступления · коммуникация.</span>
+    </div>
+    <div class="forecast-phase-info">
+      <strong>🍂 Собирать</strong>
+      <span>Анализ · корректировка · завершение · порядок.</span>
+    </div>
+    <div class="forecast-phase-info">
+      <strong>🌑 Интегрировать</strong>
+      <span>Пауза · итоги · восстановление · внутреннее внимание.</span>
+    </div>
+  </div>
+
+  <p class="muted center mt-l">
+    Не переноси важные дела только из-за цвета в календаре.
+    В конкретный день сначала сверяйся со своим состоянием.
+  </p>
+
+  <button class="btn-text center mt-m" id="forecast-edit-cycle">Обновить данные цикла</button>
+  <div class="spacer"></div>
 </section>
 
 </div>
@@ -1117,6 +1287,168 @@ function computeCycle(profile, dateISO) {
     period: M
   };
 }
+
+/* ==========================================================================
+   ПРОГНОЗ РИТМА НА ТРИ МЕСЯЦА
+   Считается тем же computeCycle, что и сегодняшний день, — просто для
+   каждой даты вперёд. Это гипотеза по календарю, а не обещание состояния.
+   ========================================================================== */
+var FORECAST_INFO = {
+  menstrual: {
+    mode: "Интегрировать",
+    phase: "Менструальная фаза",
+    copy: "Возможный период большего внутреннего внимания и восстановления.",
+    focus: "Пауза · итоги · восстановление · новый выбор",
+    css: "menstrual"
+  },
+  follicular: {
+    mode: "Создавать",
+    phase: "Фолликулярная фаза",
+    copy: "Возможный период возвращения интереса к новому и расширения.",
+    focus: "Идеи · обучение · планирование · начало",
+    css: "follicular"
+  },
+  ovulatory: {
+    mode: "Проявлять",
+    phase: "Предполагаемое овуляторное окно",
+    copy: "Возможный период большей направленности наружу и взаимодействия.",
+    focus: "Люди · переговоры · выступления · проявление",
+    css: "ovulatory"
+  },
+  luteal: {
+    mode: "Собирать",
+    phase: "Лютеиновая фаза",
+    copy: "Возможный период отбора, структурирования и завершения.",
+    focus: "Анализ · корректировка · порядок · завершение",
+    css: "luteal"
+  },
+  luteal_late: {
+    mode: "Интегрировать",
+    phase: "Поздняя лютеиновая фаза",
+    copy: "Возможный период уменьшения лишнего и большей потребности в восстановлении.",
+    focus: "Упростить · завершить · снизить нагрузку · восстановиться",
+    css: "luteal-late"
+  }
+};
+
+var WEEKDAYS = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"];
+
+// в JS неделя начинается с воскресенья, в календаре — с понедельника
+function mondayIndex(date) {
+  return (date.getDay() + 6) % 7;
+}
+
+function buildForecastMonth(profile, year, monthIndex, futureIndex) {
+  var wrapper = document.createElement("div");
+  wrapper.className = "calendar-month" +
+    (futureIndex === 1 ? " calendar-month--future-1" : "") +
+    (futureIndex === 2 ? " calendar-month--future-2" : "");
+
+  var title = document.createElement("h3");
+  title.className = "calendar-month-title";
+  title.textContent = MONTH_NAMES[monthIndex] + " " + year;
+  wrapper.appendChild(title);
+
+  var weekdays = document.createElement("div");
+  weekdays.className = "calendar-weekdays";
+  WEEKDAYS.forEach(function (name) {
+    var item = document.createElement("div");
+    item.className = "calendar-weekday";
+    item.textContent = name;
+    weekdays.appendChild(item);
+  });
+  wrapper.appendChild(weekdays);
+
+  var grid = document.createElement("div");
+  grid.className = "calendar-grid";
+
+  var firstOffset = mondayIndex(atNoon(year, monthIndex, 1));
+  var daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+
+  for (var i = 0; i < firstOffset; i++) {
+    var empty = document.createElement("div");
+    empty.className = "calendar-empty";
+    grid.appendChild(empty);
+  }
+
+  var today = todayISO();
+  for (var dayNumber = 1; dayNumber <= daysInMonth; dayNumber++) {
+    var date = atNoon(year, monthIndex, dayNumber);
+    var iso = toISO(date);
+    var cycle = computeCycle(profile, iso);
+    var info = FORECAST_INFO[cycle.phase] || FORECAST_INFO.luteal;
+
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "calendar-day calendar-day--" + info.css;
+    button.textContent = dayNumber;
+    button.dataset.date = iso;
+
+    if (iso === today) button.classList.add("calendar-day--today");
+    if (iso < today) button.classList.add("calendar-day--past");
+
+    button.setAttribute("aria-label", humanDate(iso) + ", " + info.mode);
+    button.addEventListener("click", function () {
+      $$(".calendar-day--selected").forEach(function (el) {
+        el.classList.remove("calendar-day--selected");
+      });
+      this.classList.add("calendar-day--selected");
+      renderForecastDay(profile, this.dataset.date);
+      $("#forecast-day-card").scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+
+    grid.appendChild(button);
+  }
+
+  wrapper.appendChild(grid);
+  return wrapper;
+}
+
+function renderForecast() {
+  var container = $("#forecast-calendars");
+  container.innerHTML = "";
+
+  if (!state.profile) {
+    $("#forecast-day-card").hidden = true;
+    var empty = document.createElement("p");
+    empty.className = "empty";
+    empty.textContent = "Сначала укажи данные цикла.";
+    container.appendChild(empty);
+    return;
+  }
+
+  var now = new Date();
+  for (var offset = 0; offset < 3; offset++) {
+    var month = new Date(now.getFullYear(), now.getMonth() + offset, 1);
+    container.appendChild(
+      buildForecastMonth(state.profile, month.getFullYear(), month.getMonth(), offset)
+    );
+  }
+
+  // по умолчанию открыт сегодняшний день
+  renderForecastDay(state.profile, todayISO());
+  var todayCell = container.querySelector(".calendar-day--today");
+  if (todayCell) todayCell.classList.add("calendar-day--selected");
+}
+
+function renderForecastDay(profile, iso) {
+  var cycle = computeCycle(profile, iso);
+  var info = FORECAST_INFO[cycle.phase] || FORECAST_INFO.luteal;
+
+  $("#forecast-day-card").hidden = false;
+  $("#forecast-day-date").textContent = humanDate(iso) + " · " + cycle.day + " день цикла";
+  $("#forecast-day-mode").textContent = info.mode;
+  $("#forecast-day-phase").textContent = info.phase;
+  $("#forecast-day-copy").textContent = info.copy;
+
+  $("#forecast-day-focus").innerHTML = "";
+  var label = document.createElement("strong");
+  label.textContent = "Возможный фокус:";
+  $("#forecast-day-focus").appendChild(label);
+  $("#forecast-day-focus").appendChild(document.createElement("br"));
+  $("#forecast-day-focus").appendChild(document.createTextNode(info.focus));
+}
+
 
 /* ==========================================================================
    АЛГОРИТМ: ОТВЕТЫ → РЕЖИМ
@@ -1624,6 +1956,7 @@ var state = {
   eveningBackTo: "s-welcome",
   historyBackTo: "s-welcome",
   privacyBackTo: "s-welcome",
+  forecastBackTo: "s-history",
   eveningEffect: null,
   wipeArmed: false
 };
@@ -1652,6 +1985,7 @@ function renderWelcome(todayEntry) {
   var primary = $("#welcome-primary");
   var secondary = $("#welcome-secondary");
   var historyBtn = $("#welcome-history");
+  var forecastBtn = $("#welcome-forecast");
 
   var intro = $(".project-intro");
   var about = $(".about-project");
@@ -1661,6 +1995,7 @@ function renderWelcome(todayEntry) {
     primary.textContent = "Узнать свой ритм";
     secondary.hidden = true;
     historyBtn.hidden = true;
+    forecastBtn.hidden = true;
     if (intro) intro.hidden = false;
     if (about) about.hidden = false;
     return;
@@ -1681,6 +2016,7 @@ function renderWelcome(todayEntry) {
     secondary.hidden = true;
   }
   historyBtn.hidden = false;
+  forecastBtn.hidden = false;
 }
 
 /* ——— экран 2 ——— */
@@ -2109,6 +2445,13 @@ function bindEvents() {
         show("s-privacy");
         return;
       }
+      if (target === "forecast") {
+        state.forecastBackTo = el.closest(".screen").id;
+        Analytics.onceToday("forecast", "FORECAST");
+        renderForecast();
+        show("s-forecast");
+        return;
+      }
       if (target === "done") {
         Analytics.onceToday("try", "TRY_TODAY");
         openDone(true);
@@ -2145,6 +2488,11 @@ function bindEvents() {
     show("s-cycle");
   });
   $("#privacy-back").addEventListener("click", function () { show(state.privacyBackTo || "s-welcome"); });
+  $("#forecast-back").addEventListener("click", function () { show(state.forecastBackTo || "s-history"); });
+  $("#forecast-edit-cycle").addEventListener("click", function () {
+    fillCycleForm();
+    show("s-cycle");
+  });
   $("#privacy-wipe").addEventListener("click", wipeData);
   $$("#fit-block .chip").forEach(function (b) {
     b.addEventListener("click", function () { pickFit(b); });

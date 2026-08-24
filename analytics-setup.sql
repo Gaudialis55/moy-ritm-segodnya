@@ -18,7 +18,8 @@ create table if not exists public.events (
     'FIT_YES', 'FIT_PARTLY', 'FIT_NO',
     'EVENING_START', 'EVENING_DONE',
     'HELPED', 'NO_CHANGE', 'DID_NOT_FIT',
-    'RETURN_D1', 'RETURN_D7'
+    'RETURN_D1', 'RETURN_D7',
+    'FORECAST'
   )),
 
   -- источник: латиница, цифры, дефис и подчёркивание, не длиннее 32 символов
